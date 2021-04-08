@@ -1,6 +1,6 @@
 package fr.birdo.bedwarsshop.gui;
 
-import fr.birdo.bedwarsshop.items.Items;
+import fr.birdo.bedwarsshop.utils.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,6 +15,16 @@ public class ClassicGui implements Listener {
 
     static ItemStack deco = Items.getDecoration(7);
     static ItemStack deco1 = Items.getDecoration(13);
+    private static int deco_patern[]= new int[]{9,17,18,26,27,35,36,44,45,46,47,48,49,50,51,52,53};
+
+    private static void setInventoryPatern(int[] patern, int selected, Inventory inventory){
+        for (int i: patern){
+            inventory.setItem(i, deco);
+        }
+        if(selected != 0) {
+            inventory.setItem(selected, deco1);
+        }
+    }
 
     public static void pnj01(Player p, String shop) {
 
@@ -27,7 +37,10 @@ public class ClassicGui implements Listener {
         inv.setItem(5, Items.getCategory(Material.BOW, "Bows"));
         inv.setItem(6, Items.getCategory(Material.BREWING_STAND_ITEM, "Potions"));
         inv.setItem(7, Items.getCategory(Material.TNT, "Other"));
-        inv.setItem(9, deco);
+
+        setInventoryPatern(deco_patern, 0, inv);
+
+        /*inv.setItem(9, deco);
         inv.setItem(17, deco);
         inv.setItem(18, deco);
         inv.setItem(26, deco);
@@ -43,7 +56,7 @@ public class ClassicGui implements Listener {
         inv.setItem(50, deco);
         inv.setItem(51, deco);
         inv.setItem(52, deco);
-        inv.setItem(53, deco);
+        inv.setItem(53, deco);*/
 
         switch (shop) {
             case "Blocks":

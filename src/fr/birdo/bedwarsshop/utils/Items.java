@@ -1,4 +1,4 @@
-package fr.birdo.bedwarsshop.items;
+package fr.birdo.bedwarsshop.utils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
