@@ -1,4 +1,4 @@
-package fr.birdo.bedwarsshop.utils;
+package fr.birdo.bedwarsshop;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,12 +15,10 @@ import java.util.Arrays;
 public class Items {
 
     public static ItemStack getDecoration(int metadata) {
-
         ItemStack decoration = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) metadata);
         ItemMeta decorationM = decoration.getItemMeta();
         decorationM.setDisplayName(" ");
         decoration.setItemMeta(decorationM);
-
         return decoration;
     }
 
@@ -35,7 +33,6 @@ public class Items {
             bow1M.setUnbreakable(true);
             bow1M.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
             bow1.setItemMeta(bow1M);
-
             return bow1;
 
         } else if (type == 2) {
@@ -49,7 +46,6 @@ public class Items {
             bow2M.setUnbreakable(true);
             bow2M.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
             bow2.setItemMeta(bow2M);
-
             return bow2;
         }
         return null;
@@ -65,7 +61,6 @@ public class Items {
         toolM.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         toolM.setDisplayName(ChatColor.AQUA + name + " (Efficiency I)");
         tool.setItemMeta(toolM);
-
         return tool;
     }
 
@@ -78,7 +73,6 @@ public class Items {
             potionM.setDisplayName(ChatColor.AQUA + "Speed II Potion (45 seconds)");
             potionM.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             potion.setItemMeta(potionM);
-
             return potion;
 
         } else if (type.equals("jump")) {
@@ -89,7 +83,6 @@ public class Items {
             potionM.setDisplayName(ChatColor.AQUA + "Jump V Potion (45 seconds)");
             potionM.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             potion.setItemMeta(potionM);
-
             return potion;
 
         } else if (type.equals("invisibility")) {
@@ -100,14 +93,12 @@ public class Items {
             potionM.setDisplayName(ChatColor.AQUA + "Invisibility Potion (30 seconds)");
             potionM.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             potion.setItemMeta(potionM);
-
             return potion;
         }
         return null;
     }
 
     public static ItemStack getItem(Material material, String name, int quantity, int price, String money, Boolean unbreakable) {
-
         ItemStack item = new ItemStack(material, quantity);
         ItemMeta itemM = item.getItemMeta();
         if (money.equals("iron")) {
@@ -117,23 +108,20 @@ public class Items {
         } else if (money.equals("emerald")) {
             itemM.setLore(Arrays.asList(ChatColor.GRAY + "Cost: " + ChatColor.DARK_GREEN + price + " Emeralds"));
         }
-        if (unbreakable == true) {
+        if (unbreakable) {
             itemM.setUnbreakable(true);
             itemM.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         }
         itemM.setDisplayName(ChatColor.AQUA + name);
         item.setItemMeta(itemM);
-
         return item;
     }
 
     public static ItemStack getCategory(Material material, String name) {
-
         ItemStack item = new ItemStack(material, 1);
         ItemMeta itemM = item.getItemMeta();
         itemM.setDisplayName(ChatColor.GREEN + name);
         item.setItemMeta(itemM);
-
         return item;
     }
 }

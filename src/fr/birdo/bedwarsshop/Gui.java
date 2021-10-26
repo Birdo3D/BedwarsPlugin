@@ -1,35 +1,48 @@
-package fr.birdo.bedwarsshop.gui;
+package fr.birdo.bedwarsshop;
 
-import fr.birdo.bedwarsshop.utils.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class ClassicGui implements Listener {
+import java.util.ArrayList;
+import java.util.List;
 
-    public ClassicGui() {
+public class Gui {
+
+    private static final int[] pattern = new int[]{10, 11, 12, 13, 14, 15, 16};
+
+    private static void setInventoryPattern(int[] pattern, int selected, Inventory inventory) {
+        for (int i : pattern) {
+            inventory.setItem(i, Items.getDecoration(7));
+        }
+        if (selected != -1) {
+            inventory.setItem(selected, Items.getDecoration(13));
+        }
     }
 
-    static ItemStack deco = Items.getDecoration(7);
-    static ItemStack deco1 = Items.getDecoration(13);
-    private static int deco_patern[]= new int[]{9,17,18,26,27,35,36,44,45,46,47,48,49,50,51,52,53};
-
-    private static void setInventoryPatern(int[] patern, int selected, Inventory inventory){
-        for (int i: patern){
-            inventory.setItem(i, deco);
+    private static void setProtection(int[] pattern, Inventory inventory) {
+        ItemStack decoration = Items.getDecoration(8);
+        List<Integer> test = new ArrayList<>();
+        for (int i : pattern) {
+            test.add(i);
         }
-        if(selected != 0) {
-            inventory.setItem(selected, deco1);
-        }
+        for (int i = 19; i <= 25; i++)
+            if (!test.contains(i))
+                inventory.setItem(i, decoration);
+        for (int i = 28; i <= 34; i++)
+            if (!test.contains(i))
+                inventory.setItem(i, decoration);
+        for (int i = 37; i <= 43; i++)
+            if (!test.contains(i))
+                inventory.setItem(i, decoration);
     }
 
     public static void pnj01(Player p, String shop) {
+        Inventory inv = Bukkit.createInventory(null, 6 * 9, "Item Shop - " + shop);
 
-        Inventory inv = Bukkit.createInventory(null, 6 * 9, shop);
-
+        inv.setItem(0, Items.getDecoration(7));
         inv.setItem(1, Items.getCategory(Material.HARD_CLAY, "Blocks"));
         inv.setItem(2, Items.getCategory(Material.GOLD_SWORD, "Weapons"));
         inv.setItem(3, Items.getCategory(Material.CHAINMAIL_BOOTS, "Armors"));
@@ -37,26 +50,8 @@ public class ClassicGui implements Listener {
         inv.setItem(5, Items.getCategory(Material.BOW, "Bows"));
         inv.setItem(6, Items.getCategory(Material.BREWING_STAND_ITEM, "Potions"));
         inv.setItem(7, Items.getCategory(Material.TNT, "Other"));
-
-        setInventoryPatern(deco_patern, 0, inv);
-
-        /*inv.setItem(9, deco);
-        inv.setItem(17, deco);
-        inv.setItem(18, deco);
-        inv.setItem(26, deco);
-        inv.setItem(27, deco);
-        inv.setItem(35, deco);
-        inv.setItem(36, deco);
-        inv.setItem(44, deco);
-        inv.setItem(45, deco);
-        inv.setItem(46, deco);
-        inv.setItem(47, deco);
-        inv.setItem(48, deco);
-        inv.setItem(49, deco);
-        inv.setItem(50, deco);
-        inv.setItem(51, deco);
-        inv.setItem(52, deco);
-        inv.setItem(53, deco);*/
+        inv.setItem(8, Items.getDecoration(7));
+        setInventoryPattern(new int[]{9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}, -1, inv);
 
         switch (shop) {
             case "Blocks":
@@ -67,13 +62,8 @@ public class ClassicGui implements Listener {
                 inv.setItem(23, Items.getItem(Material.LADDER, "Ladder", 16, 4, "iron", false));
                 inv.setItem(24, Items.getItem(Material.LOG_2, "Planks", 16, 4, "iron", false));
                 inv.setItem(25, Items.getItem(Material.OBSIDIAN, "Obsidian", 4, 4, "emerald", false));
-                inv.setItem(10, deco1);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 10, inv);
+                setProtection(new int[]{19, 20, 21, 22, 23, 24, 25}, inv);
                 break;
 
             case "Weapons":
@@ -81,26 +71,16 @@ public class ClassicGui implements Listener {
                 inv.setItem(20, Items.getItem(Material.IRON_SWORD, "Iron Sword", 1, 7, "gold", true));
                 inv.setItem(21, Items.getItem(Material.DIAMOND_SWORD, "Diamond Sword", 1, 3, "emerald", true));
                 inv.setItem(22, Items.getItem(Material.STICK, "Knockback Stick", 1, 4, "gold", true));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco1);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 11, inv);
+                setProtection(new int[]{19, 20, 21, 22}, inv);
                 break;
 
             case "Armors":
                 inv.setItem(19, Items.getItem(Material.CHAINMAIL_BOOTS, "Chainmail Armor", 1, 50, "iron", true));
                 inv.setItem(20, Items.getItem(Material.IRON_BOOTS, "Iron Armor", 1, 12, "gold", true));
                 inv.setItem(21, Items.getItem(Material.DIAMOND_BOOTS, "Diamond Armor", 1, 6, "emerald", true));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco1);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 12, inv);
+                setProtection(new int[]{19, 20, 21}, inv);
                 break;
 
             case "Tools":
@@ -115,13 +95,8 @@ public class ClassicGui implements Listener {
                 inv.setItem(31, Items.getItem(Material.DIAMOND_AXE, "Diamond Axe", 1, 10, "iron", true));
                 inv.setItem(32, Items.getTools(Material.DIAMOND_AXE, "Diamond Axe", 1));
                 inv.setItem(37, Items.getItem(Material.SHEARS, "Shears", 1, 10, "iron", true));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco1);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 13, inv);
+                setProtection(new int[]{19, 20, 21, 22, 23, 28, 29, 30, 31, 32, 37}, inv);
                 break;
 
             case "Bows":
@@ -129,26 +104,16 @@ public class ClassicGui implements Listener {
                 inv.setItem(20, Items.getItem(Material.BOW, "Bow", 1, 20, "gold", true));
                 inv.setItem(21, Items.getbow(1, 1));
                 inv.setItem(22, Items.getbow(2, 1));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco1);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 14, inv);
+                setProtection(new int[]{19, 20, 21, 22}, inv);
                 break;
 
             case "Potions":
                 inv.setItem(19, Items.getPotion("speed", 1));
                 inv.setItem(20, Items.getPotion("jump", 1));
                 inv.setItem(21, Items.getPotion("invisibility", 1));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco1);
-                inv.setItem(16, deco);
+                setInventoryPattern(pattern, 15, inv);
+                setProtection(new int[]{19, 20, 21}, inv);
                 break;
 
             case "Other":
@@ -158,25 +123,10 @@ public class ClassicGui implements Listener {
                 inv.setItem(22, Items.getItem(Material.WATER_BUCKET, "Water Bucket", 1, 4, "gold", false));
                 inv.setItem(23, Items.getItem(Material.MILK_BUCKET, "Milk Bucket", 1, 3, "gold", false));
                 inv.setItem(24, Items.getItem(Material.SPONGE, "Sponges", 4, 6, "gold", false));
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco1);
+                setInventoryPattern(pattern, 16, inv);
+                setProtection(new int[]{19, 20, 21, 22, 23, 24}, inv);
                 break;
-
-            default:
-                inv.setItem(10, deco);
-                inv.setItem(11, deco);
-                inv.setItem(12, deco);
-                inv.setItem(13, deco);
-                inv.setItem(14, deco);
-                inv.setItem(15, deco);
-                inv.setItem(16, deco);
         }
         p.openInventory(inv);
     }
-
 }
