@@ -19,7 +19,7 @@ public class Utils {
         if (moneyAmount >= item.getPrice()) {
             boolean place = false;
             for (int i = 0; i < 36; i++)
-                if (inventory.getItem(i) == null || (inventory.getItem(i).getType() == item.getMaterial() && inventory.getItem(i).getAmount() + item.getQuantity() <= 64))
+                if (inventory.getItem(i) == null || (inventory.getItem(i).getType() == item.getMaterial() && inventory.getItem(i).getAmount() + item.getQuantity() <= item.getMaterial().getMaxStackSize()))
                     place = true;
             if (place) {
                 List<Integer> items = new ArrayList<>();
