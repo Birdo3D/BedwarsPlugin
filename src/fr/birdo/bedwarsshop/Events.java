@@ -1,5 +1,6 @@
 package fr.birdo.bedwarsshop;
 
+import fr.birdo.bedwarsshop.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,7 +20,7 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void commands(PlayerCommandPreprocessEvent e) {
+    public void commandSendEvent(PlayerCommandPreprocessEvent e) {
         String[] args = e.getMessage().split(" ");
         if (args[0].equalsIgnoreCase("/bs") && e.getPlayer().isOp())
             if (args[1].equalsIgnoreCase("give")) {
@@ -43,7 +44,7 @@ public class Events implements Listener {
             double x = e.getClickedBlock().getLocation().getX() + 0.5;
             double y = e.getClickedBlock().getLocation().getY() + 1;
             double z = e.getClickedBlock().getLocation().getZ() + 0.5;
-            if (e.getPlayer().isOp()) {
+            if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
                 if (e.getItem() != null && e.getItem().getType() == Material.EGG) {
                     if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName() && e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Classic PNJ Spawn Egg")) {
                         e.setCancelled(true);
@@ -65,56 +66,21 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onClicDecoration(InventoryClickEvent e) {
-        String inv = e.getClickedInventory().getTitle();
-        String name = "Item Shop - ";
+    public void guiClickEvent(InventoryClickEvent e) {
+        String invName = "Item Shop - ";
         if (e.getClickedInventory() != null) {
-            if (inv.equalsIgnoreCase(name + "Blocks") || inv.equalsIgnoreCase(name + "Weapons") || inv.equalsIgnoreCase(name + "Armors") || inv.equalsIgnoreCase(name + "Tools") || inv.equalsIgnoreCase(name + "Bows") || inv.equalsIgnoreCase(name + "Potions") || inv.equalsIgnoreCase(name + "Other")) {
-                if (e.getCurrentItem() != null && e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName()) {
-                    switch (e.getCurrentItem().getItemMeta().getDisplayName()) {
-                        case "Blocks":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Blocks");
-                        case "Weapons":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Weapons");
-                        case "Armors":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Armors");
-                        case "Tools":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Tools");
-                        case "Bows":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Bows");
-                        case "Potions":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Potions");
-                        case "Other":
-                            Gui.pnj01((Player) e.getWhoClicked(), "Other");
+            String inv = e.getClickedInventory().getTitle();
+            if (inv.equalsIgnoreCase(invName + "Blocks") || inv.equalsIgnoreCase(invName + "Weapons") || inv.equalsIgnoreCase(invName + "Armors") || inv.equalsIgnoreCase(invName + "Tools") || inv.equalsIgnoreCase(invName + "Bows") || inv.equalsIgnoreCase(invName + "Potions") || inv.equalsIgnoreCase(invName + "Other")) {
+                if (e.getCurrentItem() != null && e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName())
+                    if (e.getCurrentItem().getItemMeta().getDisplayName().length() > 1) {
+                        String itemName = e.getCurrentItem().getItemMeta().getDisplayName().substring(2);
+                        if (itemName.equalsIgnoreCase("Blocks") || itemName.equalsIgnoreCase("Weapons") || itemName.equalsIgnoreCase("Armors") || itemName.equalsIgnoreCase("Tools") || itemName.equalsIgnoreCase("Bows") || itemName.equalsIgnoreCase("Potions") || itemName.equalsIgnoreCase("Other"))
+                            Gui.pnj01((Player) e.getWhoClicked(), itemName);
+                        if (Gui.getItems(inv).get(e.getSlot()) != null)
+                            Utils.buyItem((Player) e.getWhoClicked(), Gui.getItems(inv).get(e.getSlot()));
                     }
-
-                    //Achat
-                    /*if (e.getSlot() > 16 && !e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(" ")) {
-                        if (Utils.getNb(Utils.getMoneyItemStack(0), e.getWhoClicked()) >= Integer.parseInt(pricesConfig.getString("blocks.wool.price"))) {
-                            e.getWhoClicked().getInventory().addItem(new ItemStack(Material.WOOL, 16));
-                            e.getWhoClicked().getInventory().removeItem(new ItemStack(Material.IRON_INGOT, Integer.parseInt(pricesConfig.getString("blocks.wool.price"))));
-                        } else {
-                            e.getWhoClicked().sendMessage(ChatColor.RED + "You need " + (Integer.parseInt(pricesConfig.getString("blocks.wool.price")) - Utils.getNb(BedwarsShop.money0, e.getWhoClicked())) + " " + Comparator.getMaterial(pricesConfig.getString("blocks.wool.money")).getType() + " to buy this");
-                        }
-                    }*/
-                /*if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Blocks")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Blocks");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Weapons")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Weapons");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Armors")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Armors");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Tools")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Tools");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Bows")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Bows");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Potions")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Potions");
-                } else if (e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Other")) {
-                    Gui.pnj01((Player) e.getWhoClicked(), "Other");
-                }*/
-                }
+                e.setCancelled(true);
             }
         }
-        e.setCancelled(true);
     }
 }
