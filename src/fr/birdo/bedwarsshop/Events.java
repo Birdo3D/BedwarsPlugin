@@ -7,18 +7,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
 
 public class Events implements Listener {
 
-    public Events(BedwarsShop bedwarsShop) {
+    private static BedwarsShop instance;
+
+    public Events(BedwarsShop pluginInstance) {
+        instance = pluginInstance;
     }
 
     @EventHandler
@@ -127,5 +133,30 @@ public class Events implements Listener {
         e.getPlayer().getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true)));
         e.getPlayer().getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), true)));
         e.getPlayer().getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), false)));
+    }
+
+    @EventHandler
+    public void onClickOnArmorSlot(InventoryClickEvent e) {
+        if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE)
+            if (e.getClickedInventory() != null)
+                if (e.getClickedInventory() instanceof PlayerInventory)
+                    if (e.getSlot() > 35 && e.getSlot() < 40)
+                        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockPlaced(BlockPlaceEvent e) {
+        if (e.getBlock().getType() == Material.TNT) {
+            e.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
+            e.getBlockPlaced().getWorld().spawnEntity(new Location(e.getBlockPlaced().getWorld(), e.getBlockPlaced().getX() + 0.5, e.getBlockPlaced().getY(), e.getBlockPlaced().getZ() + 0.5), EntityType.PRIMED_TNT);
+        } else if (e.getBlock().getType() == Material.SPONGE) {
+            BukkitRunnable task = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    e.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
+                }
+            };
+            task.runTaskLater(instance, 20);
+        }
     }
 }

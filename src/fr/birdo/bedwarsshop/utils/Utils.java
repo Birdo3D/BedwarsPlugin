@@ -1,19 +1,24 @@
 package fr.birdo.bedwarsshop.utils;
 
 import fr.birdo.bedwarsshop.Gui;
-import net.minecraft.server.v1_12_R1.ItemPickaxe;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Utils {
 
     public static void buyItem(Player player, Item item) {
+        Item newItem = new Item(item.getMaterial(), item.getName(), item.getQuantity(), 0, MoneyType.NULL, item.isUnbreakable());
+        if (item.getEnchantments() != null)
+            for (Enchantment enchantment : item.getEnchantments())
+                newItem.addEnchant(enchantment, item.getEnchantementLevel(enchantment));
         Inventory inventory = player.getInventory();
         int moneyAmount = 0;
         for (int i = 0; i < 36; i++)
@@ -51,15 +56,15 @@ public class Utils {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
                                 if (material == Material.WOOD_PICKAXE || material == Material.IRON_PICKAXE || material == Material.GOLD_PICKAXE || material == Material.DIAMOND_PICKAXE)
-                                    inventory.setItem(i, Converter.convertToItemStack(item));
+                                    inventory.setItem(i, Converter.convertToItemStack(newItem));
                             }
                         }
-                        CustomConfigurationFile.setPickaxe(player, getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1));
+                        CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
-                        player.getInventory().addItem(Converter.convertToItemStack(item));
-                        CustomConfigurationFile.setPickaxe(player, getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1));
+                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                        CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else
@@ -73,15 +78,15 @@ public class Utils {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
                                 if (material == Material.WOOD_AXE || material == Material.STONE_AXE || material == Material.IRON_AXE || material == Material.DIAMOND_AXE)
-                                    inventory.setItem(i, Converter.convertToItemStack(item));
+                                    inventory.setItem(i, Converter.convertToItemStack(newItem));
                             }
                         }
-                        CustomConfigurationFile.setAxe(player, getToolFromID(CustomConfigurationFile.getAxe(player) + 1));
+                        CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
-                        player.getInventory().addItem(Converter.convertToItemStack(item));
-                        CustomConfigurationFile.setAxe(player, getToolFromID(CustomConfigurationFile.getAxe(player) + 1));
+                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                        CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else
@@ -92,7 +97,7 @@ public class Utils {
                 if (!CustomConfigurationFile.hasShears(player)) {
                     if (hasPlace(item, player)) {
                         CustomConfigurationFile.setShears(player, true);
-                        player.getInventory().addItem(Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true)));
+                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
                         pay(item, player);
                     } else
                         player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
@@ -101,7 +106,7 @@ public class Utils {
             } else {
                 if (hasPlace(item, player)) {
                     pay(item, player);
-                    player.getInventory().addItem(Converter.convertToItemStack(new Item(item.getMaterial(), item.getName(), item.getQuantity(), 0, MoneyType.NULL, item.isUnbreakable())));
+                    player.getInventory().addItem(Converter.convertToItemStack(newItem));
                 } else
                     player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
             }

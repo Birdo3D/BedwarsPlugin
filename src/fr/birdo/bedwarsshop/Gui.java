@@ -54,9 +54,9 @@ public class Gui {
         itemsArmors.put(20, new Item(Material.IRON_BOOTS, "Iron Armor", 1, 12, MoneyType.GOLD, true));
         itemsArmors.put(21, new Item(Material.DIAMOND_BOOTS, "Diamond Armor", 1, 6, MoneyType.EMERALD, true));
         //Tools
-        itemsTools.put(19, Utils.getToolFromID(pickaxe).getItem());
-        itemsTools.put(20, Utils.getToolFromID(axe).getItem());
-        itemsTools.put(21, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
+        itemsTools.put(19, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
+        itemsTools.put(20, Utils.getToolFromID(pickaxe).getItem());
+        itemsTools.put(21, Utils.getToolFromID(axe).getItem());
         //Bows
         itemsBows.put(19, new Item(Material.ARROW, "Arrows", 6, 2, MoneyType.GOLD, false));
         itemsBows.put(20, new Item(Material.BOW, "Bow", 1, 12, MoneyType.GOLD, true));
