@@ -103,6 +103,14 @@ public class Events implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
+        int pickaxe = CustomConfigurationFile.getPickaxe(e.getEntity().getPlayer());
+        int axe = CustomConfigurationFile.getPickaxe(e.getEntity().getPlayer());
+        if (pickaxe == 0 || pickaxe == 1)
+            pickaxe++;
+        if (axe == 0 || axe == 1)
+            axe++;
+        CustomConfigurationFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
+        CustomConfigurationFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
         e.getDrops().clear();
     }
 
@@ -110,7 +118,11 @@ public class Events implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         e.getPlayer().getInventory().setItem(0, Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true)));
         if (CustomConfigurationFile.hasShears(e.getPlayer()))
-            e.getPlayer().getInventory().setItem(1, Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true)));
+            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true)));
+        if (CustomConfigurationFile.getPickaxe(e.getPlayer()) > 0)
+            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getPickaxe(e.getPlayer())).getItem()));
+        if (CustomConfigurationFile.getAxe(e.getPlayer()) > 0)
+            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getAxe(e.getPlayer()) + 4).getItem()));
         e.getPlayer().getInventory().setHelmet(Converter.convertToItemStack(new Item(Material.LEATHER_HELMET, "Helmet", 1, 0, MoneyType.NULL, true)));
         e.getPlayer().getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true)));
         e.getPlayer().getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), true)));

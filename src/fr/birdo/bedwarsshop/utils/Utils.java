@@ -1,5 +1,7 @@
 package fr.birdo.bedwarsshop.utils;
 
+import fr.birdo.bedwarsshop.Gui;
+import net.minecraft.server.v1_12_R1.ItemPickaxe;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,6 +44,50 @@ public class Utils {
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
+            } else if (item.getName().contains("Pickaxe")) {
+                if (CustomConfigurationFile.getPickaxe(player) != 4) {
+                    if (CustomConfigurationFile.getPickaxe(player) > 0) {
+                        for (int i = 0; i < 36; i++) {
+                            if (player.getInventory().getItem(i) != null) {
+                                Material material = player.getInventory().getItem(i).getType();
+                                if (material == Material.WOOD_PICKAXE || material == Material.IRON_PICKAXE || material == Material.GOLD_PICKAXE || material == Material.DIAMOND_PICKAXE)
+                                    inventory.setItem(i, Converter.convertToItemStack(item));
+                            }
+                        }
+                        CustomConfigurationFile.setPickaxe(player, getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1));
+                        pay(item, player);
+                        Gui.pnj01(player, "Tools");
+                    } else if (hasPlace(item, player)) {
+                        player.getInventory().addItem(Converter.convertToItemStack(item));
+                        CustomConfigurationFile.setPickaxe(player, getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1));
+                        pay(item, player);
+                        Gui.pnj01(player, "Tools");
+                    } else
+                        player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
+                } else
+                    player.sendMessage(ChatColor.RED + "You already own this item !");
+            } else if (item.getName().contains("Axe")) {
+                if (CustomConfigurationFile.getAxe(player) != 4) {
+                    if (CustomConfigurationFile.getAxe(player) > 0) {
+                        for (int i = 0; i < 36; i++) {
+                            if (player.getInventory().getItem(i) != null) {
+                                Material material = player.getInventory().getItem(i).getType();
+                                if (material == Material.WOOD_AXE || material == Material.STONE_AXE || material == Material.IRON_AXE || material == Material.DIAMOND_AXE)
+                                    inventory.setItem(i, Converter.convertToItemStack(item));
+                            }
+                        }
+                        CustomConfigurationFile.setAxe(player, getToolFromID(CustomConfigurationFile.getAxe(player) + 1));
+                        pay(item, player);
+                        Gui.pnj01(player, "Tools");
+                    } else if (hasPlace(item, player)) {
+                        player.getInventory().addItem(Converter.convertToItemStack(item));
+                        CustomConfigurationFile.setAxe(player, getToolFromID(CustomConfigurationFile.getAxe(player) + 1));
+                        pay(item, player);
+                        Gui.pnj01(player, "Tools");
+                    } else
+                        player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
+                } else
+                    player.sendMessage(ChatColor.RED + "You already own this item !");
             } else if (item.getMaterial() == Material.SHEARS) {
                 if (!CustomConfigurationFile.hasShears(player)) {
                     if (hasPlace(item, player)) {
@@ -120,5 +166,12 @@ public class Utils {
                 default:
                     return new Item(Material.LEATHER_BOOTS, "Leather Boots", 1, 0, MoneyType.NULL, true);
             }
+    }
+
+    public static ToolsTypes getToolFromID(int index) {
+        for (ToolsTypes type : ToolsTypes.values())
+            if (type.getIndex() == index)
+                return type;
+        return null;
     }
 }

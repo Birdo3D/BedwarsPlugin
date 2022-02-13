@@ -1,9 +1,6 @@
 package fr.birdo.bedwarsshop;
 
-import fr.birdo.bedwarsshop.utils.Item;
-import fr.birdo.bedwarsshop.utils.Converter;
-import fr.birdo.bedwarsshop.utils.MoneyType;
-import fr.birdo.bedwarsshop.utils.ToolsTypes;
+import fr.birdo.bedwarsshop.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +29,13 @@ public class Gui {
     private static final Map<Integer, Item> itemsPotions = new HashMap<>();
     private static final Map<Integer, Item> itemsOther = new HashMap<>();
 
-    public static void initGui() {
+    public static void initGui(Player player) {
+        int pickaxe = CustomConfigurationFile.getPickaxe(player) + 1;
+        int axe = CustomConfigurationFile.getAxe(player) + 5;
+        if (pickaxe > 4)
+            pickaxe = 4;
+        if (axe > 8)
+            axe = 8;
         //Blocks
         itemsBlocks.put(19, new Item(Material.WOOL, "Wool", 16, 4, MoneyType.IRON, false));
         itemsBlocks.put(20, new Item(Material.HARD_CLAY, "Clay", 16, 12, MoneyType.IRON, false));
@@ -50,8 +54,8 @@ public class Gui {
         itemsArmors.put(20, new Item(Material.IRON_BOOTS, "Iron Armor", 1, 12, MoneyType.GOLD, true));
         itemsArmors.put(21, new Item(Material.DIAMOND_BOOTS, "Diamond Armor", 1, 6, MoneyType.EMERALD, true));
         //Tools
-        itemsTools.put(19, ToolsTypes.PICKAXE_LVL1.getItem());
-        itemsTools.put(20, ToolsTypes.AXE_LVL1.getItem());
+        itemsTools.put(19, Utils.getToolFromID(pickaxe).getItem());
+        itemsTools.put(20, Utils.getToolFromID(axe).getItem());
         itemsTools.put(21, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
         //Bows
         itemsBows.put(19, new Item(Material.ARROW, "Arrows", 6, 2, MoneyType.GOLD, false));
@@ -98,7 +102,7 @@ public class Gui {
     }
 
     public static void pnj01(Player p, String shop) {
-        initGui();
+        initGui(p);
         Inventory inv = Bukkit.createInventory(null, 6 * 9, "Item Shop - " + shop);
 
         inv.setItem(0, getDecoration(7));
