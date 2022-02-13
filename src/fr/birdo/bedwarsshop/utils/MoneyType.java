@@ -4,6 +4,7 @@ import org.bukkit.Material;
 
 public enum MoneyType {
 
+    NULL(null),
     IRON(Material.IRON_INGOT),
     GOLD(Material.GOLD_INGOT),
     EMERALD(Material.EMERALD);

@@ -1,16 +1,20 @@
 package fr.birdo.bedwarsshop;
 
-import fr.birdo.bedwarsshop.utils.Utils;
+import fr.birdo.bedwarsshop.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Events implements Listener {
 
@@ -80,5 +84,36 @@ public class Events implements Listener {
                 e.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        File playerDataFile = new File(BedwarsShop.playerDataFolderPath + "/" + e.getPlayer().getUniqueId() + ".yml");
+        if (!playerDataFile.exists()) {
+            try {
+                playerDataFile.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        if (playerDataFile.exists()) {
+            CustomConfigurationFile.createSections(e.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        e.getDrops().clear();
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        e.getPlayer().getInventory().setItem(0, Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true)));
+        if (CustomConfigurationFile.hasShears(e.getPlayer()))
+            e.getPlayer().getInventory().setItem(1, Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true)));
+        e.getPlayer().getInventory().setHelmet(Converter.convertToItemStack(new Item(Material.LEATHER_HELMET, "Helmet", 1, 0, MoneyType.NULL, true)));
+        e.getPlayer().getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true)));
+        e.getPlayer().getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), true)));
+        e.getPlayer().getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), false)));
     }
 }

@@ -3,6 +3,7 @@ package fr.birdo.bedwarsshop;
 import fr.birdo.bedwarsshop.utils.Item;
 import fr.birdo.bedwarsshop.utils.Converter;
 import fr.birdo.bedwarsshop.utils.MoneyType;
+import fr.birdo.bedwarsshop.utils.ToolsTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -49,17 +50,9 @@ public class Gui {
         itemsArmors.put(20, new Item(Material.IRON_BOOTS, "Iron Armor", 1, 12, MoneyType.GOLD, true));
         itemsArmors.put(21, new Item(Material.DIAMOND_BOOTS, "Diamond Armor", 1, 6, MoneyType.EMERALD, true));
         //Tools
-        itemsTools.put(19, new Item(Material.WOOD_PICKAXE, "Wood Pickaxe", 1, 10, MoneyType.IRON, true).addEnchant(Enchantment.DIG_SPEED, 1));
-        itemsTools.put(20, new Item(Material.STONE_PICKAXE, "Stone Pickaxe", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(21, new Item(Material.IRON_PICKAXE, "Iron Pickaxe", 1, 10, MoneyType.IRON, true).addEnchant(Enchantment.DIG_SPEED, 2));
-        itemsTools.put(22, new Item(Material.DIAMOND_PICKAXE, "Diamond Pickaxe", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(23, new Item(Material.DIAMOND_PICKAXE, "Diamond Pickaxe (Efficiency I)", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(28, new Item(Material.WOOD_AXE, "Wood Axe", 1, 10, MoneyType.IRON, true).addEnchant(Enchantment.DIG_SPEED, 1));
-        itemsTools.put(29, new Item(Material.STONE_AXE, "Stone Axe", 1, 10, MoneyType.IRON, true).addEnchant(Enchantment.DIG_SPEED, 1));
-        itemsTools.put(30, new Item(Material.IRON_AXE, "Iron Axe", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(31, new Item(Material.DIAMOND_AXE, "Diamond Axe", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(32, new Item(Material.DIAMOND_AXE, "Diamond Axe (Efficiency I)", 1, 10, MoneyType.IRON, true));
-        itemsTools.put(37, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
+        itemsTools.put(19, ToolsTypes.PICKAXE_LVL1.getItem());
+        itemsTools.put(20, ToolsTypes.AXE_LVL1.getItem());
+        itemsTools.put(21, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
         //Bows
         itemsBows.put(19, new Item(Material.ARROW, "Arrows", 6, 2, MoneyType.GOLD, false));
         itemsBows.put(20, new Item(Material.BOW, "Bow", 1, 12, MoneyType.GOLD, true));
