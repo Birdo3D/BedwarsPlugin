@@ -8,12 +8,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -65,12 +68,12 @@ public class Events implements Listener {
 
     @EventHandler
     public void openGui(PlayerInteractEntityEvent e) {
-        if (e.getRightClicked().getType() == EntityType.VILLAGER) {
-            if (e.getRightClicked().getCustomName().equalsIgnoreCase("Item Shop")) {
-                e.setCancelled(true);
-                Gui.pnj01(e.getPlayer(), "Blocks");
-            }
-        }
+        if (e.getRightClicked().getType() == EntityType.VILLAGER)
+            if (!e.getPlayer().isSneaking())
+                if (e.getRightClicked().getCustomName().equalsIgnoreCase("Item Shop")) {
+                    e.setCancelled(true);
+                    Gui.pnj01(e.getPlayer(), "Blocks");
+                }
     }
 
     @EventHandler
@@ -94,45 +97,52 @@ public class Events implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+        boolean exist = false;
         File playerDataFile = new File(BedwarsShop.playerDataFolderPath + "/" + e.getPlayer().getUniqueId() + ".yml");
         if (!playerDataFile.exists()) {
             try {
                 playerDataFile.createNewFile();
+                exist = true;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        if (playerDataFile.exists()) {
+        if (playerDataFile.exists() && exist) {
             CustomConfigurationFile.createSections(e.getPlayer());
+            setupInventory(e.getPlayer());
         }
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         int pickaxe = CustomConfigurationFile.getPickaxe(e.getEntity().getPlayer());
-        int axe = CustomConfigurationFile.getPickaxe(e.getEntity().getPlayer());
+        int axe = CustomConfigurationFile.getAxe(e.getEntity().getPlayer());
         if (pickaxe == 0 || pickaxe == 1)
             pickaxe++;
         if (axe == 0 || axe == 1)
             axe++;
         CustomConfigurationFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
-        CustomConfigurationFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
+        CustomConfigurationFile.setAxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
         e.getDrops().clear();
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        e.getPlayer().getInventory().setItem(0, Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true)));
-        if (CustomConfigurationFile.hasShears(e.getPlayer()))
-            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true)));
-        if (CustomConfigurationFile.getPickaxe(e.getPlayer()) > 0)
-            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getPickaxe(e.getPlayer())).getItem()));
-        if (CustomConfigurationFile.getAxe(e.getPlayer()) > 0)
-            e.getPlayer().getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getAxe(e.getPlayer()) + 4).getItem()));
-        e.getPlayer().getInventory().setHelmet(Converter.convertToItemStack(new Item(Material.LEATHER_HELMET, "Helmet", 1, 0, MoneyType.NULL, true)));
-        e.getPlayer().getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true)));
-        e.getPlayer().getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), true)));
-        e.getPlayer().getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(e.getPlayer()), false)));
+        setupInventory(e.getPlayer());
+    }
+
+    private void setupInventory(Player player) {
+        player.getInventory().setItem(0, Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true), false));
+        if (CustomConfigurationFile.hasShears(player))
+            player.getInventory().addItem(Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true), false));
+        if (CustomConfigurationFile.getPickaxe(player) > 0)
+            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getPickaxe(player)).getItem(), false));
+        if (CustomConfigurationFile.getAxe(player) > 0)
+            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getAxe(player) + 4).getItem(), false));
+        player.getInventory().setHelmet(Converter.convertToItemStack(new Item(Material.LEATHER_HELMET, "Helmet", 1, 0, MoneyType.NULL, true), false));
+        player.getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true), false));
+        player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(player), true), false));
+        player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(player), false), false));
     }
 
     @EventHandler
@@ -150,13 +160,162 @@ public class Events implements Listener {
             e.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
             e.getBlockPlaced().getWorld().spawnEntity(new Location(e.getBlockPlaced().getWorld(), e.getBlockPlaced().getX() + 0.5, e.getBlockPlaced().getY(), e.getBlockPlaced().getZ() + 0.5), EntityType.PRIMED_TNT);
         } else if (e.getBlock().getType() == Material.SPONGE) {
-            BukkitRunnable task = new BukkitRunnable() {
+            e.getBlockPlaced().getLocation().getBlock().setData((byte) 1);
+            World world = e.getBlock().getWorld();
+            double x = e.getBlockPlaced().getX();
+            double y = e.getBlockPlaced().getY();
+            double z = e.getBlockPlaced().getZ();
+            for (int x1 = -1; x1 < 2; x1++) {
+                for (int y1 = -1; y1 < 2; y1++) {
+                    for (int z1 = -1; z1 < 2; z1++) {
+                        Location location = new Location(world, x + x1, y + y1, z + z1);
+                        if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.STATIONARY_WATER)
+                            location.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+            BukkitRunnable task1 = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (int x1 = -2; x1 < 3; x1++) {
+                        for (int y1 = -2; y1 < 3; y1++) {
+                            for (int z1 = -2; z1 < 3; z1++) {
+                                Location location = new Location(world, x + x1, y + y1, z + z1);
+                                if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.STATIONARY_WATER)
+                                    location.getBlock().setType(Material.AIR);
+                            }
+                        }
+                    }
+                }
+            };
+            task1.runTaskLater(instance, 5);
+            BukkitRunnable task2 = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (int x1 = -3; x1 < 4; x1++) {
+                        for (int y1 = -3; y1 < 4; y1++) {
+                            for (int z1 = -3; z1 < 4; z1++) {
+                                Location location = new Location(world, x + x1, y + y1, z + z1);
+                                if (location.getBlock().getType() == Material.WATER || location.getBlock().getType() == Material.STATIONARY_WATER)
+                                    location.getBlock().setType(Material.AIR);
+                            }
+                        }
+                    }
+                }
+            };
+            task2.runTaskLater(instance, 10);
+            BukkitRunnable task3 = new BukkitRunnable() {
                 @Override
                 public void run() {
                     e.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
                 }
             };
-            task.runTaskLater(instance, 20);
+            task3.runTaskLater(instance, 15);
+        }
+    }
+
+    @EventHandler
+    public void onPNJDamageEvent(EntityDamageEvent e) {
+        if (e.getEntity().getType() == EntityType.VILLAGER)
+            if (e.getEntity().getCustomName().equalsIgnoreCase("Item Shop"))
+                e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void removePNJ(PlayerInteractEntityEvent e) {
+        if (e.getPlayer().getGameMode() == GameMode.CREATIVE)
+            if (e.getPlayer().isSneaking())
+                if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD)
+                    if (e.getRightClicked().getType() == EntityType.VILLAGER)
+                        if (e.getRightClicked().getCustomName().equalsIgnoreCase("Item Shop"))
+                            e.getRightClicked().remove();
+    }
+
+    @EventHandler
+    public void onBucketUse(PlayerBucketEmptyEvent e) {
+        BukkitRunnable task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (e.getBucket() == Material.WATER_BUCKET) {
+                    e.getPlayer().getInventory().setItem(e.getPlayer().getInventory().getHeldItemSlot(), new ItemStack(Material.WATER_BUCKET, 0));
+                    e.getPlayer().updateInventory();
+                }
+            }
+        };
+        task.runTaskLater(instance, 1);
+    }
+
+    @EventHandler
+    public void onConsumeItem(PlayerItemConsumeEvent e) {
+        BukkitRunnable task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (e.getItem().getType() == Material.MILK_BUCKET || e.getItem().getType() == Material.POTION) {
+                    e.getPlayer().getInventory().setItem(e.getPlayer().getInventory().getHeldItemSlot(), new ItemStack(e.getItem().getType(), 0));
+                    e.getPlayer().updateInventory();
+                }
+            }
+        };
+        task.runTaskLater(instance, 1);
+    }
+
+    @EventHandler
+    public void onCraft(CraftItemEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onMoveItem(InventoryClickEvent e) {
+        if (!e.getInventory().getTitle().equalsIgnoreCase("container.crafting"))
+            if (e.getCurrentItem() != null)
+                if (Utils.isTool(e.getCurrentItem().getType()))
+                    e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDropItem(PlayerDropItemEvent e) {
+        if (Utils.isTool(e.getItemDrop().getItemStack().getType()))
+            e.setCancelled(true);
+    }
+
+    public static void ticking(Plugin plugin) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            checkInventory();
+        }, 0L, 1L);
+    }
+
+    private static void checkInventory() {
+        boolean hasSword;
+        int woodSword = -1;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            hasSword = false;
+            for (int i = 0; i < 36; i++) {
+                if (player.getInventory().getItem(i) != null) {
+                    Material mat = player.getInventory().getItem(i).getType();
+                    if (mat == Material.BUCKET || mat == Material.GLASS_BOTTLE)
+                        player.getInventory().getItem(i).setAmount(0);
+                    if (mat == Material.STONE_SWORD || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD) {
+                        if (player.getInventory().contains(Material.WOOD_SWORD))
+                            for (int j = 0; j < 36; j++)
+                                if (player.getInventory().getItem(j) != null)
+                                    if (player.getInventory().getItem(j).getType() == Material.WOOD_SWORD)
+                                        player.getInventory().getItem(j).setAmount(0);
+                        hasSword = true;
+                    }
+                    if (mat == Material.WOOD_SWORD) {
+                        hasSword = true;
+                        woodSword = i;
+                    }
+                }
+                if (i == 35 && !hasSword)
+                    player.getInventory().addItem(Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true), false));
+            }
+            if (woodSword > -1)
+                for (int i = 0; i < 36; i++)
+                    if (player.getInventory().getItem(i) != null)
+                        if (player.getInventory().getItem(i).getType() == Material.WOOD_SWORD)
+                            if (i != woodSword)
+                                player.getInventory().getItem(i).setAmount(0);
         }
     }
 }

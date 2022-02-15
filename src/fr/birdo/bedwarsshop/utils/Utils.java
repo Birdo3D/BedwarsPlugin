@@ -1,12 +1,16 @@
 package fr.birdo.bedwarsshop.utils;
 
 import fr.birdo.bedwarsshop.Gui;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +19,6 @@ import java.util.Objects;
 public class Utils {
 
     public static void buyItem(Player player, Item item) {
-        Item newItem = new Item(item.getMaterial(), item.getName(), item.getQuantity(), 0, MoneyType.NULL, item.isUnbreakable());
-        if (item.getEnchantments() != null)
-            for (Enchantment enchantment : item.getEnchantments())
-                newItem.addEnchant(enchantment, item.getEnchantementLevel(enchantment));
         Inventory inventory = player.getInventory();
         int moneyAmount = 0;
         for (int i = 0; i < 36; i++)
@@ -28,24 +28,24 @@ public class Utils {
             if (item.getMaterial() == Material.CHAINMAIL_BOOTS) {
                 if (CustomConfigurationFile.getArmorType(player) == 0) {
                     CustomConfigurationFile.setArmorType(player, ArmorTypes.CHAINMAIL);
-                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), true)));
-                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), false)));
+                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), true), false));
+                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
             } else if (item.getMaterial() == Material.IRON_BOOTS) {
                 if (CustomConfigurationFile.getArmorType(player) < 2) {
                     CustomConfigurationFile.setArmorType(player, ArmorTypes.IRON);
-                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), true)));
-                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), false)));
+                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), true), false));
+                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
             } else if (item.getMaterial() == Material.DIAMOND_BOOTS) {
                 if (CustomConfigurationFile.getArmorType(player) < 3) {
                     CustomConfigurationFile.setArmorType(player, ArmorTypes.DIAMOND);
-                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), true)));
-                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), false)));
+                    player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), true), false));
+                    player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
@@ -56,14 +56,14 @@ public class Utils {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
                                 if (material == Material.WOOD_PICKAXE || material == Material.IRON_PICKAXE || material == Material.GOLD_PICKAXE || material == Material.DIAMOND_PICKAXE)
-                                    inventory.setItem(i, Converter.convertToItemStack(newItem));
+                                    inventory.setItem(i, Converter.convertToItemStack(item, false));
                             }
                         }
                         CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
-                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                        player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
@@ -78,14 +78,14 @@ public class Utils {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
                                 if (material == Material.WOOD_AXE || material == Material.STONE_AXE || material == Material.IRON_AXE || material == Material.DIAMOND_AXE)
-                                    inventory.setItem(i, Converter.convertToItemStack(newItem));
+                                    inventory.setItem(i, Converter.convertToItemStack(item, false));
                             }
                         }
                         CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
-                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                        player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
@@ -97,7 +97,7 @@ public class Utils {
                 if (!CustomConfigurationFile.hasShears(player)) {
                     if (hasPlace(item, player)) {
                         CustomConfigurationFile.setShears(player, true);
-                        player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                        player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         pay(item, player);
                     } else
                         player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
@@ -106,7 +106,7 @@ public class Utils {
             } else {
                 if (hasPlace(item, player)) {
                     pay(item, player);
-                    player.getInventory().addItem(Converter.convertToItemStack(newItem));
+                    player.getInventory().addItem(Converter.convertToItemStack(item, false));
                 } else
                     player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
             }
@@ -178,5 +178,9 @@ public class Utils {
             if (type.getIndex() == index)
                 return type;
         return null;
+    }
+
+    public static boolean isTool(Material material) {
+        return material == Material.SHEARS || material == Material.WOOD_PICKAXE || material == Material.IRON_PICKAXE || material == Material.GOLD_PICKAXE || material == Material.DIAMOND_PICKAXE || material == Material.WOOD_AXE || material == Material.STONE_AXE || material == Material.IRON_AXE || material == Material.DIAMOND_AXE;
     }
 }

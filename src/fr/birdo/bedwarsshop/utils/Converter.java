@@ -12,19 +12,21 @@ import java.util.Arrays;
 
 public class Converter {
 
-    public static ItemStack convertToItemStack(Item item) {
+    public static ItemStack convertToItemStack(Item item, boolean lore) {
         ItemStack itemStack = new ItemStack(item.getMaterial(), item.getQuantity());
         if (item.isPotion()) {
             PotionMeta itemStackMeta = (PotionMeta) itemStack.getItemMeta();
             for (PotionEffect potionEffect : item.getPotionEffects())
                 itemStackMeta.addCustomEffect(potionEffect, true);
-            setLore(item, itemStackMeta);
+            if (lore)
+                setLore(item, itemStackMeta);
             itemStackMeta.setDisplayName(ChatColor.AQUA + item.getName());
             itemStackMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             itemStack.setItemMeta(itemStackMeta);
         } else {
             ItemMeta itemStackMeta = itemStack.getItemMeta();
-            setLore(item, itemStackMeta);
+            if (lore)
+                setLore(item, itemStackMeta);
             if (item.isUnbreakable()) {
                 itemStackMeta.setUnbreakable(true);
                 itemStackMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);

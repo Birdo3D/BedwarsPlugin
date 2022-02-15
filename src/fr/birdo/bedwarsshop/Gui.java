@@ -39,7 +39,7 @@ public class Gui {
         //Blocks
         itemsBlocks.put(19, new Item(Material.WOOL, "Wool", 16, 4, MoneyType.IRON, false));
         itemsBlocks.put(20, new Item(Material.HARD_CLAY, "Clay", 16, 12, MoneyType.IRON, false));
-        itemsBlocks.put(21, new Item(Material.GLASS, "Glass", 4, 12, MoneyType.IRON, false));
+        itemsBlocks.put(21, new Item(Material.GLASS, "Blast-Proof Glass", 4, 12, MoneyType.IRON, false));
         itemsBlocks.put(22, new Item(Material.ENDER_STONE, "End Stone", 12, 24, MoneyType.IRON, false));
         itemsBlocks.put(23, new Item(Material.LADDER, "Ladder", 8, 4, MoneyType.IRON, false));
         itemsBlocks.put(24, new Item(Material.WOOD, "Planks", 16, 4, MoneyType.GOLD, false));
@@ -48,13 +48,13 @@ public class Gui {
         itemsWeapons.put(19, new Item(Material.STONE_SWORD, "Stone Sword", 1, 10, MoneyType.IRON, true));
         itemsWeapons.put(20, new Item(Material.IRON_SWORD, "Iron Sword", 1, 7, MoneyType.GOLD, true));
         itemsWeapons.put(21, new Item(Material.DIAMOND_SWORD, "Diamond Sword", 1, 4, MoneyType.EMERALD, true));
-        itemsWeapons.put(22, new Item(Material.STICK, "Knockback Stick", 1, 5, MoneyType.GOLD, true).addEnchant(Enchantment.KNOCKBACK, 1));
+        itemsWeapons.put(22, new Item(Material.STICK, "Stick (Knockback I)", 1, 5, MoneyType.GOLD, true).addEnchant(Enchantment.KNOCKBACK, 1));
         //Armors
-        itemsArmors.put(19, new Item(Material.CHAINMAIL_BOOTS, "Chainmail Armor", 1, 30, MoneyType.IRON, true));
-        itemsArmors.put(20, new Item(Material.IRON_BOOTS, "Iron Armor", 1, 12, MoneyType.GOLD, true));
-        itemsArmors.put(21, new Item(Material.DIAMOND_BOOTS, "Diamond Armor", 1, 6, MoneyType.EMERALD, true));
+        itemsArmors.put(19, new Item(Material.CHAINMAIL_BOOTS, "Permanent Chainmail Armor", 1, 30, MoneyType.IRON, true));
+        itemsArmors.put(20, new Item(Material.IRON_BOOTS, "Permanent Iron Armor", 1, 12, MoneyType.GOLD, true));
+        itemsArmors.put(21, new Item(Material.DIAMOND_BOOTS, "Permanent Diamond Armor", 1, 6, MoneyType.EMERALD, true));
         //Tools
-        itemsTools.put(19, new Item(Material.SHEARS, "Shears", 1, 20, MoneyType.IRON, true));
+        itemsTools.put(19, new Item(Material.SHEARS, "Permanent Shears", 1, 20, MoneyType.IRON, true));
         itemsTools.put(20, Utils.getToolFromID(pickaxe).getItem());
         itemsTools.put(21, Utils.getToolFromID(axe).getItem());
         //Bows
@@ -63,9 +63,9 @@ public class Gui {
         itemsBows.put(21, new Item(Material.BOW, "Bow (Power I)", 1, 20, MoneyType.GOLD, true).addEnchant(Enchantment.ARROW_DAMAGE, 1));
         itemsBows.put(22, new Item(Material.BOW, "Bow (Power I, Punch I)", 1, 6, MoneyType.EMERALD, true).addEnchant(Enchantment.ARROW_DAMAGE, 1).addEnchant(Enchantment.ARROW_KNOCKBACK, 1));
         //Potions
-        itemsPotions.put(19, new Item(Material.POTION, "Speed II Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 45 * 20, 1)));
-        itemsPotions.put(20, new Item(Material.POTION, "Jump V Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 45 * 20, 5)));
-        itemsPotions.put(21, new Item(Material.POTION, "Invisibility Potion (30 seconds)", 1, 2, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 1)));
+        itemsPotions.put(19, new Item(Material.POTION, "Speed II Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 45 * 20, 1, true, false)));
+        itemsPotions.put(20, new Item(Material.POTION, "Jump V Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 45 * 20, 4, true, false)));
+        itemsPotions.put(21, new Item(Material.POTION, "Invisibility Potion (30 seconds)", 1, 2, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0, true, false)));
         //Other
         itemsOther.put(19, new Item(Material.GOLDEN_APPLE, "Golden Apple", 1, 3, MoneyType.GOLD, false));
         itemsOther.put(20, new Item(Material.TNT, "Tnt", 1, 4, MoneyType.GOLD, false));
@@ -119,49 +119,49 @@ public class Gui {
         switch (shop) {
             case "Blocks":
                 for (int i : itemsBlocks.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsBlocks.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsBlocks.get(i), true));
                 setInventoryPattern(pattern, 10, inv);
                 setProtection(new int[]{19, 20, 21, 22, 23, 24, 25}, inv);
                 break;
 
             case "Weapons":
                 for (int i : itemsWeapons.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsWeapons.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsWeapons.get(i), true));
                 setInventoryPattern(pattern, 11, inv);
                 setProtection(new int[]{19, 20, 21, 22}, inv);
                 break;
 
             case "Armors":
                 for (int i : itemsArmors.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsArmors.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsArmors.get(i), true));
                 setInventoryPattern(pattern, 12, inv);
                 setProtection(new int[]{19, 20, 21}, inv);
                 break;
 
             case "Tools":
                 for (int i : itemsTools.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsTools.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsTools.get(i), true));
                 setInventoryPattern(pattern, 13, inv);
                 setProtection(new int[]{19, 20, 21, 22, 23, 28, 29, 30, 31, 32, 37}, inv);
                 break;
 
             case "Bows":
                 for (int i : itemsBows.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsBows.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsBows.get(i), true));
                 setInventoryPattern(pattern, 14, inv);
                 setProtection(new int[]{19, 20, 21, 22}, inv);
                 break;
 
             case "Potions":
                 for (int i : itemsPotions.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsPotions.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsPotions.get(i), true));
                 setInventoryPattern(pattern, 15, inv);
                 setProtection(new int[]{19, 20, 21}, inv);
                 break;
 
             case "Other":
                 for (int i : itemsOther.keySet())
-                    inv.setItem(i, Converter.convertToItemStack(itemsOther.get(i)));
+                    inv.setItem(i, Converter.convertToItemStack(itemsOther.get(i), true));
                 setInventoryPattern(pattern, 16, inv);
                 setProtection(new int[]{19, 20, 21, 22, 23, 24}, inv);
                 break;
