@@ -52,12 +52,20 @@ public class TeamDataFile {
         saveFile(cfg, team);
     }
 
-    public static void setBedLocation(String team, Location bedLocation) {
+    public static void setBed1Location(String team, Location bedLocation) {
         FileConfiguration cfg = getConfigFile(team);
         cfg.set("Bed.world", bedLocation.getWorld());
-        cfg.set("Bed.x", bedLocation.getX());
-        cfg.set("Bed.y", bedLocation.getY());
-        cfg.set("Bed.z", bedLocation.getZ());
+        cfg.set("Bed1.x", bedLocation.getX());
+        cfg.set("Bed1.y", bedLocation.getY());
+        cfg.set("Bed1.z", bedLocation.getZ());
+        saveFile(cfg, team);
+    }
+
+    public static void setBed2Location(String team, Location bedLocation) {
+        FileConfiguration cfg = getConfigFile(team);
+        cfg.set("Bed2.x", bedLocation.getX());
+        cfg.set("Bed2.y", bedLocation.getY());
+        cfg.set("Bed2.z", bedLocation.getZ());
         saveFile(cfg, team);
     }
 
@@ -70,8 +78,12 @@ public class TeamDataFile {
         saveFile(cfg, team);
     }
 
-    public static Location getBedLocation(String team) {
-        return new Location(Bukkit.getWorld(getConfigFile(team).getString("Bed.world")), getConfigFile(team).getInt("Bed.x"), getConfigFile(team).getInt("Bed.y"), getConfigFile(team).getInt("Bed.z"));
+    public static Location getBed1Location(String team) {
+        return new Location(Bukkit.getWorld(getConfigFile(team).getString("Bed.world")), getConfigFile(team).getInt("Bed1.x"), getConfigFile(team).getInt("Bed1.y"), getConfigFile(team).getInt("Bed1.z"));
+    }
+
+    public static Location getBed2Location(String team) {
+        return new Location(Bukkit.getWorld(getConfigFile(team).getString("Bed.world")), getConfigFile(team).getInt("Bed2.x"), getConfigFile(team).getInt("Bed2.y"), getConfigFile(team).getInt("Bed2.z"));
     }
 
     public static Location getSpawnLocation(String team) {
@@ -96,9 +108,12 @@ public class TeamDataFile {
         cfg.set("LivePlayers", new ArrayList<>());
         cfg.set("Bed.present", false);
         cfg.set("Bed.world", "null");
-        cfg.set("Bed.x", 0);
-        cfg.set("Bed.y", 0);
-        cfg.set("Bed.z", 0);
+        cfg.set("Bed1.x", 0);
+        cfg.set("Bed1.y", 0);
+        cfg.set("Bed1.z", 0);
+        cfg.set("Bed2.x", 0);
+        cfg.set("Bed2.y", 0);
+        cfg.set("Bed2.z", 0);
         cfg.set("Spawn.world", "null");
         cfg.set("Spawn.x", 0);
         cfg.set("Spawn.y", 0);

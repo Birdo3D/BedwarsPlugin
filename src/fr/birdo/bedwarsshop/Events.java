@@ -65,11 +65,17 @@ public class Events implements Listener {
                         PlayerDataFile.setTeam(player, "null");
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été retiré des équipes !");
                     }
-            } else if (args[1].equalsIgnoreCase("setBed")) {
+            } else if (args[1].equalsIgnoreCase("setBed1")) {
                 for (String team : BedwarsShop.teams)
                     if (args[2].equalsIgnoreCase(team)) {
-                        TeamDataFile.setBedLocation(team, e.getPlayer().getLocation());
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit de cette équipe à été correctement placé !");
+                        TeamDataFile.setBed1Location(team, e.getPlayer().getLocation());
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit1 de cette équipe à été correctement placé !");
+                    }
+            } else if (args[1].equalsIgnoreCase("setBed2")) {
+                for (String team : BedwarsShop.teams)
+                    if (args[2].equalsIgnoreCase(team)) {
+                        TeamDataFile.setBed2Location(team, e.getPlayer().getLocation());
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit2 de cette équipe à été correctement placé !");
                     }
             } else if (args[1].equalsIgnoreCase("setSpawn")) {
                 for (String team : BedwarsShop.teams)
@@ -189,9 +195,9 @@ public class Events implements Listener {
 
     @EventHandler
     public void onBedDestroy(BlockBreakEvent e) {
-        if (e.getBlock().getType() == Material.BED)
+        if (e.getBlock().getType() == Material.BED_BLOCK)
             for (String team : BedwarsShop.teams)
-                if (TeamDataFile.getBedLocation(team).equals(e.getBlock().getLocation())) {
+                if (TeamDataFile.getBed1Location(team).equals(e.getBlock().getLocation()) || TeamDataFile.getBed2Location(team).equals(e.getBlock().getLocation())) {
                     TeamDataFile.setBed(team, false);
                     Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");
                 }
