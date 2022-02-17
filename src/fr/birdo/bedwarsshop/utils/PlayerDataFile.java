@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 
-public class CustomConfigurationFile {
+public class PlayerDataFile {
 
     public static void setArmorType(Player player, ArmorTypes armorType) {
         FileConfiguration cfg = getConfigFile(player);
@@ -34,6 +34,12 @@ public class CustomConfigurationFile {
         saveFile(cfg, player);
     }
 
+    public static void setTeam(Player player, String team) {
+        FileConfiguration cfg = getConfigFile(player);
+        cfg.set("Team", team);
+        saveFile(cfg, player);
+    }
+
     public static int getArmorType(Player player) {
         return getConfigFile(player).getInt("ArmorType");
     }
@@ -50,12 +56,17 @@ public class CustomConfigurationFile {
         return getConfigFile(player).getBoolean("Tools.shears");
     }
 
+    public static String getTeam(Player player) {
+        return getConfigFile(player).getString("Team");
+    }
+
     public static void createSections(Player player) {
         FileConfiguration cfg = getConfigFile(player);
         cfg.set("ArmorType", ArmorTypes.LEATHER.getIndex());
         cfg.set("Tools.pickaxe", ToolsTypes.NULL.getIndex());
         cfg.set("Tools.axe", ToolsTypes.NULL.getIndex());
         cfg.set("Tools.shears", false);
+        cfg.set("Team", "null");
         saveFile(cfg, player);
     }
 

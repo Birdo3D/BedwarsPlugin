@@ -12,7 +12,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +29,8 @@ public class Gui {
     private static final Map<Integer, Item> itemsOther = new HashMap<>();
 
     public static void initGui(Player player) {
-        int pickaxe = CustomConfigurationFile.getPickaxe(player) + 1;
-        int axe = CustomConfigurationFile.getAxe(player) + 5;
+        int pickaxe = PlayerDataFile.getPickaxe(player) + 1;
+        int axe = PlayerDataFile.getAxe(player) + 5;
         if (pickaxe > 4)
             pickaxe = 4;
         if (axe > 8)
@@ -65,7 +64,7 @@ public class Gui {
         //Potions
         itemsPotions.put(19, new Item(Material.POTION, "Speed II Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 45 * 20, 1, true, false)));
         itemsPotions.put(20, new Item(Material.POTION, "Jump V Potion (45 seconds)", 1, 1, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 45 * 20, 4, true, false)));
-        itemsPotions.put(21, new Item(Material.POTION, "Invisibility Potion (30 seconds)", 1, 2, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0, true, false)));
+        itemsPotions.put(21, new Item(Material.POTION, "Invisibility Potion (30 seconds)", 1, 2, MoneyType.EMERALD, false).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 1, true, false)));
         //Other
         itemsOther.put(19, new Item(Material.GOLDEN_APPLE, "Golden Apple", 1, 3, MoneyType.GOLD, false));
         itemsOther.put(20, new Item(Material.TNT, "Tnt", 1, 4, MoneyType.GOLD, false));

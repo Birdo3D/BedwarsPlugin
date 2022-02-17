@@ -1,16 +1,11 @@
 package fr.birdo.bedwarsshop.utils;
 
+import fr.birdo.bedwarsshop.BedwarsShop;
 import fr.birdo.bedwarsshop.Gui;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,32 +21,32 @@ public class Utils {
                 moneyAmount = moneyAmount + inventory.getItem(i).getAmount();
         if (moneyAmount >= item.getPrice()) {
             if (item.getMaterial() == Material.CHAINMAIL_BOOTS) {
-                if (CustomConfigurationFile.getArmorType(player) == 0) {
-                    CustomConfigurationFile.setArmorType(player, ArmorTypes.CHAINMAIL);
+                if (PlayerDataFile.getArmorType(player) == 0) {
+                    PlayerDataFile.setArmorType(player, ArmorTypes.CHAINMAIL);
                     player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), true), false));
                     player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.CHAINMAIL.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
             } else if (item.getMaterial() == Material.IRON_BOOTS) {
-                if (CustomConfigurationFile.getArmorType(player) < 2) {
-                    CustomConfigurationFile.setArmorType(player, ArmorTypes.IRON);
+                if (PlayerDataFile.getArmorType(player) < 2) {
+                    PlayerDataFile.setArmorType(player, ArmorTypes.IRON);
                     player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), true), false));
                     player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.IRON.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
             } else if (item.getMaterial() == Material.DIAMOND_BOOTS) {
-                if (CustomConfigurationFile.getArmorType(player) < 3) {
-                    CustomConfigurationFile.setArmorType(player, ArmorTypes.DIAMOND);
+                if (PlayerDataFile.getArmorType(player) < 3) {
+                    PlayerDataFile.setArmorType(player, ArmorTypes.DIAMOND);
                     player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), true), false));
                     player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(ArmorTypes.DIAMOND.getIndex(), false), false));
                     pay(item, player);
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this armor or better !");
             } else if (item.getName().contains("Pickaxe")) {
-                if (CustomConfigurationFile.getPickaxe(player) != 4) {
-                    if (CustomConfigurationFile.getPickaxe(player) > 0) {
+                if (PlayerDataFile.getPickaxe(player) != 4) {
+                    if (PlayerDataFile.getPickaxe(player) > 0) {
                         for (int i = 0; i < 36; i++) {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
@@ -59,12 +54,12 @@ public class Utils {
                                     inventory.setItem(i, Converter.convertToItemStack(item, false));
                             }
                         }
-                        CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
+                        PlayerDataFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
                         player.getInventory().addItem(Converter.convertToItemStack(item, false));
-                        CustomConfigurationFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getPickaxe(player) + 1)));
+                        PlayerDataFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getPickaxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else
@@ -72,8 +67,8 @@ public class Utils {
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this item !");
             } else if (item.getName().contains("Axe")) {
-                if (CustomConfigurationFile.getAxe(player) != 4) {
-                    if (CustomConfigurationFile.getAxe(player) > 0) {
+                if (PlayerDataFile.getAxe(player) != 4) {
+                    if (PlayerDataFile.getAxe(player) > 0) {
                         for (int i = 0; i < 36; i++) {
                             if (player.getInventory().getItem(i) != null) {
                                 Material material = player.getInventory().getItem(i).getType();
@@ -81,12 +76,12 @@ public class Utils {
                                     inventory.setItem(i, Converter.convertToItemStack(item, false));
                             }
                         }
-                        CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
+                        PlayerDataFile.setAxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
                         player.getInventory().addItem(Converter.convertToItemStack(item, false));
-                        CustomConfigurationFile.setAxe(player, Objects.requireNonNull(getToolFromID(CustomConfigurationFile.getAxe(player) + 1)));
+                        PlayerDataFile.setAxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getAxe(player) + 1)));
                         pay(item, player);
                         Gui.pnj01(player, "Tools");
                     } else
@@ -94,9 +89,9 @@ public class Utils {
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this item !");
             } else if (item.getMaterial() == Material.SHEARS) {
-                if (!CustomConfigurationFile.hasShears(player)) {
+                if (!PlayerDataFile.hasShears(player)) {
                     if (hasPlace(item, player)) {
-                        CustomConfigurationFile.setShears(player, true);
+                        PlayerDataFile.setShears(player, true);
                         player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         pay(item, player);
                     } else
@@ -182,5 +177,22 @@ public class Utils {
 
     public static boolean isTool(Material material) {
         return material == Material.SHEARS || material == Material.WOOD_PICKAXE || material == Material.IRON_PICKAXE || material == Material.GOLD_PICKAXE || material == Material.DIAMOND_PICKAXE || material == Material.WOOD_AXE || material == Material.STONE_AXE || material == Material.IRON_AXE || material == Material.DIAMOND_AXE;
+    }
+
+    public static void launchGame() {
+        for (String team : BedwarsShop.teams) {
+            if (!TeamDataFile.getPlayers(team).isEmpty()) {
+                TeamDataFile.setBed(team, true);
+            }
+        }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
+                player.setGameMode(GameMode.SURVIVAL);
+                player.teleport(TeamDataFile.getSpawnLocation(PlayerDataFile.getTeam(player)));
+            } else {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.teleport(new Location(player.getWorld(), 0, 64, 0));
+            }
+        }
     }
 }

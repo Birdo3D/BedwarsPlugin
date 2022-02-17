@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -33,7 +34,7 @@ public class Events implements Listener {
     @EventHandler
     public void commandSendEvent(PlayerCommandPreprocessEvent e) {
         String[] args = e.getMessage().split(" ");
-        if (args[0].equalsIgnoreCase("/bs") && e.getPlayer().isOp())
+        if (args[0].equalsIgnoreCase("/bs") && e.getPlayer().getGameMode() == GameMode.CREATIVE) {
             if (args[1].equalsIgnoreCase("give")) {
                 if (args[2].equalsIgnoreCase("pnj")) {
                     ItemStack egg = new ItemStack(Material.EGG, 1);
@@ -41,12 +42,55 @@ public class Events implements Listener {
                     eggM.setDisplayName("Classic PNJ Spawn Egg");
                     egg.setItemMeta(eggM);
                     e.getPlayer().getInventory().addItem(egg);
-                    e.setCancelled(true);
                 }
-            } else if (args[1].equalsIgnoreCase("test")) {
+            } else if (args[1].equalsIgnoreCase("launch")) {
+                Utils.launchGame();
+                Bukkit.broadcastMessage(ChatColor.GREEN + "Lancement de la partie !");
+            } else if (args[1].equalsIgnoreCase("set")) {
+                for (Player player : Bukkit.getOnlinePlayers())
+                    if (args[2].equalsIgnoreCase(player.getName()))
+                        for (String team : BedwarsShop.teams)
+                            if (args[3].equalsIgnoreCase(team))
+                                if (PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
+                                    PlayerDataFile.setTeam(player, team);
+                                    TeamDataFile.addPlayer(team, player);
+                                    Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été ajouté à l'équipe !");
+                                } else
+                                    e.getPlayer().sendMessage(ChatColor.RED + "Le joueur appartient déjà à une équipe !");
+            } else if (args[1].equalsIgnoreCase("remove")) {
+                for (Player player : Bukkit.getOnlinePlayers())
+                    if (args[2].equalsIgnoreCase(player.getName())) {
+                        for (String team : BedwarsShop.teams)
+                            TeamDataFile.removePlayer(team, player);
+                        PlayerDataFile.setTeam(player, "null");
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été retiré des équipes !");
+                    }
+            } else if (args[1].equalsIgnoreCase("setBed")) {
+                for (String team : BedwarsShop.teams)
+                    if (args[2].equalsIgnoreCase(team)) {
+                        TeamDataFile.setBedLocation(team, e.getPlayer().getLocation());
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit de cette équipe à été correctement placé !");
+                    }
+            } else if (args[1].equalsIgnoreCase("setSpawn")) {
+                for (String team : BedwarsShop.teams)
+                    if (args[2].equalsIgnoreCase(team)) {
+                        TeamDataFile.setSpawnLocation(team, e.getPlayer().getLocation());
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le point de spawn de cette équipe à été correctement placé !");
+                    }
+            } else if (args[1].equalsIgnoreCase("list")) {
+                e.getPlayer().sendMessage("Commandes disponibles :");
+                e.getPlayer().sendMessage("- /bs give pnj");
+                e.getPlayer().sendMessage("- /bs launch");
+                e.getPlayer().sendMessage("- /bs set 'player' 'team'");
+                e.getPlayer().sendMessage("- /bs remove 'player'");
+                e.getPlayer().sendMessage("- /bs setBed 'team'");
+                e.getPlayer().sendMessage("- /bs setSpawn 'team'");
+                e.getPlayer().sendMessage("- /bs list");
+                e.getPlayer().sendMessage("- /bs test");
+            } else if (args[1].equalsIgnoreCase("test"))
                 e.getPlayer().sendMessage(ChatColor.GREEN + "Le plugin fonctionne correctement !");
-                e.setCancelled(true);
-            }
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -108,41 +152,63 @@ public class Events implements Listener {
             }
         }
         if (playerDataFile.exists() && exist) {
-            CustomConfigurationFile.createSections(e.getPlayer());
+            PlayerDataFile.createSections(e.getPlayer());
             setupInventory(e.getPlayer());
         }
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        int pickaxe = CustomConfigurationFile.getPickaxe(e.getEntity().getPlayer());
-        int axe = CustomConfigurationFile.getAxe(e.getEntity().getPlayer());
+        int pickaxe = PlayerDataFile.getPickaxe(e.getEntity().getPlayer());
+        int axe = PlayerDataFile.getAxe(e.getEntity().getPlayer());
         if (pickaxe == 0 || pickaxe == 1)
             pickaxe++;
         if (axe == 0 || axe == 1)
             axe++;
-        CustomConfigurationFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
-        CustomConfigurationFile.setAxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
+        PlayerDataFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
+        PlayerDataFile.setAxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
         e.getDrops().clear();
+        for (String team : BedwarsShop.teams)
+            if (TeamDataFile.getPlayers(team).contains(e.getEntity().getName()))
+                TeamDataFile.removeLivePlayer(team, e.getEntity().getPlayer());
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        setupInventory(e.getPlayer());
+        for (String team : BedwarsShop.teams)
+            if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName()))
+                if (TeamDataFile.hasBed(team)) {
+                    TeamDataFile.addLivePlayer(team, e.getPlayer());
+                    setupInventory(e.getPlayer());
+                    e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
+                } else {
+                    e.getPlayer().setGameMode(GameMode.SPECTATOR);
+                    e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), 0, 64, 0));
+                }
+    }
+
+    @EventHandler
+    public void onBedDestroy(BlockBreakEvent e) {
+        if (e.getBlock().getType() == Material.BED)
+            for (String team : BedwarsShop.teams)
+                if (TeamDataFile.getBedLocation(team).equals(e.getBlock().getLocation())) {
+                    TeamDataFile.setBed(team, false);
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");
+                }
     }
 
     private void setupInventory(Player player) {
         player.getInventory().setItem(0, Converter.convertToItemStack(new Item(Material.WOOD_SWORD, "Wooden Sword", 1, 0, MoneyType.NULL, true), false));
-        if (CustomConfigurationFile.hasShears(player))
+        if (PlayerDataFile.hasShears(player))
             player.getInventory().addItem(Converter.convertToItemStack(new Item(Material.SHEARS, "Shears", 1, 0, MoneyType.NULL, true), false));
-        if (CustomConfigurationFile.getPickaxe(player) > 0)
-            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getPickaxe(player)).getItem(), false));
-        if (CustomConfigurationFile.getAxe(player) > 0)
-            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(CustomConfigurationFile.getAxe(player) + 4).getItem(), false));
+        if (PlayerDataFile.getPickaxe(player) > 0)
+            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(PlayerDataFile.getPickaxe(player)).getItem(), false));
+        if (PlayerDataFile.getAxe(player) > 0)
+            player.getInventory().addItem(Converter.convertToItemStack(Utils.getToolFromID(PlayerDataFile.getAxe(player) + 4).getItem(), false));
         player.getInventory().setHelmet(Converter.convertToItemStack(new Item(Material.LEATHER_HELMET, "Helmet", 1, 0, MoneyType.NULL, true), false));
         player.getInventory().setChestplate(Converter.convertToItemStack(new Item(Material.LEATHER_CHESTPLATE, "Chestplate", 1, 0, MoneyType.NULL, true), false));
-        player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(player), true), false));
-        player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(CustomConfigurationFile.getArmorType(player), false), false));
+        player.getInventory().setLeggings(Converter.convertToItemStack(Utils.getArmor(PlayerDataFile.getArmorType(player), true), false));
+        player.getInventory().setBoots(Converter.convertToItemStack(Utils.getArmor(PlayerDataFile.getArmorType(player), false), false));
     }
 
     @EventHandler
