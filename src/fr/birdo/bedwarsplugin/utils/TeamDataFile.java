@@ -1,6 +1,6 @@
-package fr.birdo.bedwarsshop.utils;
+package fr.birdo.bedwarsplugin.utils;
 
-import fr.birdo.bedwarsshop.BedwarsShop;
+import fr.birdo.bedwarsplugin.BedwarsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -126,7 +126,7 @@ public class TeamDataFile {
     }
 
     private static File getFile(String team) {
-        return new File(BedwarsShop.teamDataFolderPath + "/" + team + ".yml");
+        return new File(BedwarsPlugin.teamDataFolderPath + "/" + team + ".yml");
     }
 
     private static void saveFile(FileConfiguration fileConfiguration, String team) {

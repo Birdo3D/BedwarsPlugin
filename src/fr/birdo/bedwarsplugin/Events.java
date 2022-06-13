@@ -1,6 +1,6 @@
-package fr.birdo.bedwarsshop;
+package fr.birdo.bedwarsplugin;
 
-import fr.birdo.bedwarsshop.utils.*;
+import fr.birdo.bedwarsplugin.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,9 +25,9 @@ import java.io.IOException;
 
 public class Events implements Listener {
 
-    private static BedwarsShop instance;
+    private static BedwarsPlugin instance;
 
-    public Events(BedwarsShop pluginInstance) {
+    public Events(BedwarsPlugin pluginInstance) {
         instance = pluginInstance;
     }
 
@@ -49,7 +49,7 @@ public class Events implements Listener {
             } else if (args[1].equalsIgnoreCase("set")) {
                 for (Player player : Bukkit.getOnlinePlayers())
                     if (args[2].equalsIgnoreCase(player.getName()))
-                        for (String team : BedwarsShop.teams)
+                        for (String team : BedwarsPlugin.teams)
                             if (args[3].equalsIgnoreCase(team))
                                 if (PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
                                     PlayerDataFile.setTeam(player, team);
@@ -60,25 +60,25 @@ public class Events implements Listener {
             } else if (args[1].equalsIgnoreCase("remove")) {
                 for (Player player : Bukkit.getOnlinePlayers())
                     if (args[2].equalsIgnoreCase(player.getName())) {
-                        for (String team : BedwarsShop.teams)
+                        for (String team : BedwarsPlugin.teams)
                             TeamDataFile.removePlayer(team, player);
                         PlayerDataFile.setTeam(player, "null");
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été retiré des équipes !");
                     }
             } else if (args[1].equalsIgnoreCase("setBed1")) {
-                for (String team : BedwarsShop.teams)
+                for (String team : BedwarsPlugin.teams)
                     if (args[2].equalsIgnoreCase(team)) {
                         TeamDataFile.setBed1Location(team, e.getPlayer().getLocation());
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit1 de cette équipe à été correctement placé !");
                     }
             } else if (args[1].equalsIgnoreCase("setBed2")) {
-                for (String team : BedwarsShop.teams)
+                for (String team : BedwarsPlugin.teams)
                     if (args[2].equalsIgnoreCase(team)) {
                         TeamDataFile.setBed2Location(team, e.getPlayer().getLocation());
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit2 de cette équipe à été correctement placé !");
                     }
             } else if (args[1].equalsIgnoreCase("setSpawn")) {
-                for (String team : BedwarsShop.teams)
+                for (String team : BedwarsPlugin.teams)
                     if (args[2].equalsIgnoreCase(team)) {
                         TeamDataFile.setSpawnLocation(team, e.getPlayer().getLocation());
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Le point de spawn de cette équipe à été correctement placé !");
@@ -148,7 +148,7 @@ public class Events implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         boolean exist = false;
-        File playerDataFile = new File(BedwarsShop.playerDataFolderPath + "/" + e.getPlayer().getUniqueId() + ".yml");
+        File playerDataFile = new File(BedwarsPlugin.playerDataFolderPath + "/" + e.getPlayer().getUniqueId() + ".yml");
         if (!playerDataFile.exists()) {
             try {
                 playerDataFile.createNewFile();
@@ -174,14 +174,14 @@ public class Events implements Listener {
         PlayerDataFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
         PlayerDataFile.setAxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
         e.getDrops().clear();
-        for (String team : BedwarsShop.teams)
+        for (String team : BedwarsPlugin.teams)
             if (TeamDataFile.getPlayers(team).contains(e.getEntity().getName()))
                 TeamDataFile.removeLivePlayer(team, e.getEntity().getPlayer());
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        for (String team : BedwarsShop.teams)
+        for (String team : BedwarsPlugin.teams)
             if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName()))
                 if (TeamDataFile.hasBed(team)) {
                     TeamDataFile.addLivePlayer(team, e.getPlayer());
@@ -196,7 +196,7 @@ public class Events implements Listener {
     @EventHandler
     public void onBedDestroy(BlockBreakEvent e) {
         if (e.getBlock().getType() == Material.BED_BLOCK)
-            for (String team : BedwarsShop.teams)
+            for (String team : BedwarsPlugin.teams)
                 if (TeamDataFile.getBed1Location(team).equals(e.getBlock().getLocation()) || TeamDataFile.getBed2Location(team).equals(e.getBlock().getLocation())) {
                     TeamDataFile.setBed(team, false);
                     Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");

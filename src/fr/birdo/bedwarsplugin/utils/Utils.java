@@ -1,7 +1,7 @@
-package fr.birdo.bedwarsshop.utils;
+package fr.birdo.bedwarsplugin.utils;
 
-import fr.birdo.bedwarsshop.BedwarsShop;
-import fr.birdo.bedwarsshop.Gui;
+import fr.birdo.bedwarsplugin.BedwarsPlugin;
+import fr.birdo.bedwarsplugin.Gui;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -180,7 +180,7 @@ public class Utils {
     }
 
     public static void launchGame() {
-        for (String team : BedwarsShop.teams) {
+        for (String team : BedwarsPlugin.teams) {
             if (!TeamDataFile.getPlayers(team).isEmpty()) {
                 TeamDataFile.setBed(team, true);
             }

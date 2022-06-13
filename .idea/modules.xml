@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BedwarsShop.iml" filepath="$PROJECT_DIR$/BedwarsShop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BedwarsPlugin.iml" filepath="$PROJECT_DIR$/BedwarsPlugin.iml" />
     </modules>
   </component>
 </project>

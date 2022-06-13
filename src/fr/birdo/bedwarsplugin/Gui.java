@@ -1,6 +1,6 @@
-package fr.birdo.bedwarsshop;
+package fr.birdo.bedwarsplugin;
 
-import fr.birdo.bedwarsshop.utils.*;
+import fr.birdo.bedwarsplugin.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

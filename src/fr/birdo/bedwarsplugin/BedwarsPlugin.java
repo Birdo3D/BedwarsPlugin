@@ -1,7 +1,7 @@
-package fr.birdo.bedwarsshop;
+package fr.birdo.bedwarsplugin;
 
-import fr.birdo.bedwarsshop.utils.PlayerDataFile;
-import fr.birdo.bedwarsshop.utils.TeamDataFile;
+import fr.birdo.bedwarsplugin.utils.PlayerDataFile;
+import fr.birdo.bedwarsplugin.utils.TeamDataFile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BedwarsShop extends JavaPlugin {
+public class BedwarsPlugin extends JavaPlugin {
 
     public static String playerDataFolderPath;
     public static String teamDataFolderPath;
@@ -42,7 +42,7 @@ public class BedwarsShop extends JavaPlugin {
         }
         if (!Bukkit.getOnlinePlayers().isEmpty())
             for (Player player : Bukkit.getOnlinePlayers()) {
-                File playerDataFile = new File(BedwarsShop.playerDataFolderPath + "/" + player.getUniqueId() + ".yml");
+                File playerDataFile = new File(BedwarsPlugin.playerDataFolderPath + "/" + player.getUniqueId() + ".yml");
                 if (!playerDataFile.exists()) {
                     try {
                         playerDataFile.createNewFile();
@@ -53,7 +53,7 @@ public class BedwarsShop extends JavaPlugin {
                 }
             }
         for (String team : teams) {
-            File teamDataFile = new File(BedwarsShop.teamDataFolderPath + "/" + team + ".yml");
+            File teamDataFile = new File(BedwarsPlugin.teamDataFolderPath + "/" + team + ".yml");
             if (!teamDataFile.exists()) {
                 try {
                     teamDataFile.createNewFile();

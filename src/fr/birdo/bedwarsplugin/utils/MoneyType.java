@@ -1,4 +1,4 @@
-package fr.birdo.bedwarsshop.utils;
+package fr.birdo.bedwarsplugin.utils;
 
 import org.bukkit.Material;
 

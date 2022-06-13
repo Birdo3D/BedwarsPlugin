@@ -1,8 +1,8 @@
-main: fr.birdo.bedwarsshop.BedwarsShop
+main: fr.birdo.bedwarsplugin.BedwarsPlugin
 
-name: BedwarsShop
+name: BedwarsPlugin
 
-description: Plugin de shop pour bedwars.
+description: Bedwars bukkit plugin.
 
 author: Birdo770
 

@@ -1,6 +1,6 @@
-package fr.birdo.bedwarsshop.utils;
+package fr.birdo.bedwarsplugin.utils;
 
-import fr.birdo.bedwarsshop.BedwarsShop;
+import fr.birdo.bedwarsplugin.BedwarsPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -75,7 +75,7 @@ public class PlayerDataFile {
     }
 
     private static File getFile(Player player) {
-        return new File(BedwarsShop.playerDataFolderPath + "/" + player.getUniqueId() + ".yml");
+        return new File(BedwarsPlugin.playerDataFolderPath + "/" + player.getUniqueId() + ".yml");
     }
 
     private static void saveFile(FileConfiguration fileConfiguration, Player player) {
