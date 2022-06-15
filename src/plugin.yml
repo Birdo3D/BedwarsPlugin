@@ -7,3 +7,8 @@ description: Bedwars bukkit plugin.
 author: Birdo770
 
 version: 1.0
+
+commands:
+  bedwars:
+    description: Plugin command
+    aliases: bw

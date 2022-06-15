@@ -1,7 +1,9 @@
 package fr.birdo.bedwarsplugin;
 
+import fr.birdo.bedwarsplugin.guis.*;
 import fr.birdo.bedwarsplugin.utils.*;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,11 +19,15 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Bed;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Events implements Listener {
 
@@ -31,71 +37,74 @@ public class Events implements Listener {
         instance = pluginInstance;
     }
 
+    private final Map<Player, Block> clickedBlock = new HashMap<>();
+
     @EventHandler
     public void commandSendEvent(PlayerCommandPreprocessEvent e) {
         String[] args = e.getMessage().split(" ");
-        if (args[0].equalsIgnoreCase("/bs") && e.getPlayer().getGameMode() == GameMode.CREATIVE) {
-            if (args[1].equalsIgnoreCase("give")) {
-                if (args[2].equalsIgnoreCase("pnj")) {
-                    ItemStack egg = new ItemStack(Material.EGG, 1);
-                    ItemMeta eggM = egg.getItemMeta();
-                    eggM.setDisplayName("Classic PNJ Spawn Egg");
-                    egg.setItemMeta(eggM);
-                    e.getPlayer().getInventory().addItem(egg);
-                }
-            } else if (args[1].equalsIgnoreCase("launch")) {
-                Utils.launchGame();
-                Bukkit.broadcastMessage(ChatColor.GREEN + "Lancement de la partie !");
-            } else if (args[1].equalsIgnoreCase("set")) {
-                for (Player player : Bukkit.getOnlinePlayers())
-                    if (args[2].equalsIgnoreCase(player.getName()))
-                        for (String team : BedwarsPlugin.teams)
-                            if (args[3].equalsIgnoreCase(team))
-                                if (PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
-                                    PlayerDataFile.setTeam(player, team);
-                                    TeamDataFile.addPlayer(team, player);
-                                    Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été ajouté à l'équipe !");
-                                } else
-                                    e.getPlayer().sendMessage(ChatColor.RED + "Le joueur appartient déjà à une équipe !");
-            } else if (args[1].equalsIgnoreCase("remove")) {
-                for (Player player : Bukkit.getOnlinePlayers())
-                    if (args[2].equalsIgnoreCase(player.getName())) {
-                        for (String team : BedwarsPlugin.teams)
-                            TeamDataFile.removePlayer(team, player);
-                        PlayerDataFile.setTeam(player, "null");
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le joueur à bien été retiré des équipes !");
+        if ((args[0].equalsIgnoreCase("/bw") || args[0].equalsIgnoreCase("/bedwars")) && e.getPlayer().getGameMode() == GameMode.CREATIVE) {
+            if (args.length > 1) {
+                if (args[1].equalsIgnoreCase("give")) {
+                    if (args.length > 2) {
+                        if (args[2].equalsIgnoreCase("pnj")) {
+                            ItemStack egg = new ItemStack(Material.EGG, 1);
+                            ItemMeta eggM = egg.getItemMeta();
+                            eggM.setDisplayName("Classic PNJ Spawn Egg");
+                            egg.setItemMeta(eggM);
+                            e.getPlayer().getInventory().addItem(egg);
+                        }
                     }
-            } else if (args[1].equalsIgnoreCase("setBed1")) {
-                for (String team : BedwarsPlugin.teams)
-                    if (args[2].equalsIgnoreCase(team)) {
-                        TeamDataFile.setBed1Location(team, e.getPlayer().getLocation());
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit1 de cette équipe à été correctement placé !");
+                } else if (args[1].equalsIgnoreCase("launch")) {
+                    Utils.launchGame();
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Lancement de la partie !");
+                } else if (args[1].equalsIgnoreCase("diamond")) {
+                    e.getPlayer().openInventory(GuiDiamondGen.Gui());
+                } else if (args[1].equalsIgnoreCase("generators")) {
+                    e.getPlayer().openInventory(GuiGenerators.Gui());
+                } else if (args[1].equalsIgnoreCase("teams")) {
+                    e.getPlayer().openInventory(GuiTeams.Gui());
+                } else if (args[1].equalsIgnoreCase("set")) {
+                    if (args.length > 3) {
+                        for (Player player : Bukkit.getOnlinePlayers())
+                            if (args[2].equalsIgnoreCase(player.getName()))
+                                for (String team : BedwarsPlugin.teams)
+                                    if (args[3].equalsIgnoreCase(team))
+                                        if (PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
+                                            PlayerDataFile.setTeam(player, team);
+                                            TeamDataFile.addPlayer(team, player);
+                                            e.getPlayer().sendMessage(ChatColor.GREEN + "Le joueur à bien été ajouté à l'équipe !");
+                                        } else
+                                            e.getPlayer().sendMessage(ChatColor.RED + "Le joueur appartient déjà à une équipe !");
                     }
-            } else if (args[1].equalsIgnoreCase("setBed2")) {
-                for (String team : BedwarsPlugin.teams)
-                    if (args[2].equalsIgnoreCase(team)) {
-                        TeamDataFile.setBed2Location(team, e.getPlayer().getLocation());
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le lit2 de cette équipe à été correctement placé !");
+                } else if (args[1].equalsIgnoreCase("remove")) {
+                    if (args.length > 2) {
+                        for (Player player : Bukkit.getOnlinePlayers())
+                            if (args[2].equalsIgnoreCase(player.getName())) {
+                                for (String team : BedwarsPlugin.teams)
+                                    TeamDataFile.removePlayer(team, player);
+                                PlayerDataFile.setTeam(player, "null");
+                                e.getPlayer().sendMessage(ChatColor.GREEN + "Le joueur à bien été retiré des équipes !");
+                            }
                     }
-            } else if (args[1].equalsIgnoreCase("setSpawn")) {
-                for (String team : BedwarsPlugin.teams)
-                    if (args[2].equalsIgnoreCase(team)) {
-                        TeamDataFile.setSpawnLocation(team, e.getPlayer().getLocation());
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Le point de spawn de cette équipe à été correctement placé !");
-                    }
-            } else if (args[1].equalsIgnoreCase("list")) {
-                e.getPlayer().sendMessage("Commandes disponibles :");
-                e.getPlayer().sendMessage("- /bs give pnj");
-                e.getPlayer().sendMessage("- /bs launch");
-                e.getPlayer().sendMessage("- /bs set 'player' 'team'");
-                e.getPlayer().sendMessage("- /bs remove 'player'");
-                e.getPlayer().sendMessage("- /bs setBed 'team'");
-                e.getPlayer().sendMessage("- /bs setSpawn 'team'");
-                e.getPlayer().sendMessage("- /bs list");
-                e.getPlayer().sendMessage("- /bs test");
-            } else if (args[1].equalsIgnoreCase("test"))
-                e.getPlayer().sendMessage(ChatColor.GREEN + "Le plugin fonctionne correctement !");
-            e.setCancelled(true);
+                } else if (args[1].equalsIgnoreCase("beds")) {
+                    e.getPlayer().openInventory(GuiBeds.Gui(false));
+                } else if (args[1].equalsIgnoreCase("spawns")) {
+                    e.getPlayer().openInventory(GuiSpawns.Gui());
+                } else if (args[1].equalsIgnoreCase("help")) {
+                    e.getPlayer().sendMessage("Commandes disponibles :");
+                    e.getPlayer().sendMessage("- /bw give pnj");
+                    e.getPlayer().sendMessage("- /bw launch");
+                    e.getPlayer().sendMessage("- /bw set 'player' 'team'");
+                    e.getPlayer().sendMessage("- /bw remove 'player'");
+                    e.getPlayer().sendMessage("- /bw beds");
+                    e.getPlayer().sendMessage("- /bw teams");
+                    e.getPlayer().sendMessage("- /bw spawns");
+                    e.getPlayer().sendMessage("- /bw help");
+                    e.getPlayer().sendMessage("- /bw test");
+                } else if (args[1].equalsIgnoreCase("test"))
+                    e.getPlayer().sendMessage(ChatColor.GREEN + "Le plugin fonctionne correctement !");
+                e.setCancelled(true);
+            }
         }
     }
 
@@ -182,15 +191,15 @@ public class Events implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         for (String team : BedwarsPlugin.teams)
-            if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName()))
+            if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName())) {
                 if (TeamDataFile.hasBed(team)) {
                     TeamDataFile.addLivePlayer(team, e.getPlayer());
                     setupInventory(e.getPlayer());
-                    e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
                 } else {
                     e.getPlayer().setGameMode(GameMode.SPECTATOR);
-                    e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), 0, 64, 0));
                 }
+                e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
+            }
     }
 
     @EventHandler
@@ -198,8 +207,12 @@ public class Events implements Listener {
         if (e.getBlock().getType() == Material.BED_BLOCK)
             for (String team : BedwarsPlugin.teams)
                 if (TeamDataFile.getBed1Location(team).equals(e.getBlock().getLocation()) || TeamDataFile.getBed2Location(team).equals(e.getBlock().getLocation())) {
-                    TeamDataFile.setBed(team, false);
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");
+                    if (!TeamDataFile.getPlayers(team).contains(e.getPlayer().getName())) {
+                        TeamDataFile.setBed(team, false);
+                        Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");
+                    } else {
+                        e.getPlayer().sendMessage(ChatColor.RED + "You can't break your own bed !");
+                    }
                 }
     }
 
@@ -388,6 +401,102 @@ public class Events implements Listener {
                         if (player.getInventory().getItem(i).getType() == Material.WOOD_SWORD)
                             if (i != woodSword)
                                 player.getInventory().getItem(i).setAmount(0);
+        }
+    }
+
+    @EventHandler
+    public void onClick(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().isSneaking()) {
+            if (event.getItem() != null && event.getItem().getType() == Material.CARROT_STICK) {
+                if (event.getClickedBlock().getType() == Material.BED_BLOCK) {
+                    this.clickedBlock.put(event.getPlayer(), event.getClickedBlock());
+                    event.getPlayer().openInventory(GuiBeds.Gui(true));
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onClickGui(InventoryClickEvent event) {
+        if (event.getView().getTitle().equalsIgnoreCase("Set team bed")) {
+            if (event.getSlot() < 8) {
+                if (event.getClick().isLeftClick()) {
+                    if (this.clickedBlock.get(event.getWhoClicked()) != null) {
+                        String team = BedwarsPlugin.teams.get(event.getSlot());
+                        Block block = this.clickedBlock.get(event.getWhoClicked());
+                        Bed b = (Bed) block.getState().getData();
+                        TeamDataFile.setBed1Location(team, block.getLocation());
+                        if (b.isHeadOfBed()) {
+                            TeamDataFile.setBed2Location(team, block.getRelative(b.getFacing().getOppositeFace()).getLocation());
+                        } else {
+                            TeamDataFile.setBed2Location(team, block.getRelative(b.getFacing()).getLocation());
+                        }
+                        TeamDataFile.setBed(team, true);
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le lit de cette équipe à été correctement placé !");
+                        this.clickedBlock.remove(event.getWhoClicked());
+                    }
+                } else if (event.getClick().isRightClick()) {
+                    Location bed1 = TeamDataFile.getBed1Location(BedwarsPlugin.teams.get(event.getSlot()));
+                    Location bed2 = TeamDataFile.getBed2Location(BedwarsPlugin.teams.get(event.getSlot()));
+                    if (bed1.getX() + bed1.getY() + bed2.getX() + bed2.getY() != 0) {
+                        TeamDataFile.setBed1Location(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        TeamDataFile.setBed2Location(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        TeamDataFile.setBed(BedwarsPlugin.teams.get(event.getSlot()), false);
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le lit de cette équipe à été correctement retiré !");
+                    }
+                }
+                event.getWhoClicked().openInventory(GuiBeds.Gui(false));
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set team spawn")) {
+            if (event.getSlot() < 8) {
+                if (event.getClick().isLeftClick()) {
+                    String team = BedwarsPlugin.teams.get(event.getSlot());
+                    TeamDataFile.setSpawnLocation(team, event.getWhoClicked().getLocation());
+                    event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le spawn de cette équipe à été correctement placé !");
+                } else if (event.getClick().isRightClick()) {
+                    Location spawnLocation = TeamDataFile.getSpawnLocation(BedwarsPlugin.teams.get(event.getSlot()));
+                    if (spawnLocation.getX() + spawnLocation.getY() != 0) {
+                        TeamDataFile.setSpawnLocation(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le spawn de cette équipe à été correctement retiré !");
+                    }
+                }
+                event.getWhoClicked().openInventory(GuiSpawns.Gui());
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set team generator")) {
+            if (event.getSlot() < 8) {
+                if (event.getClick().isLeftClick()) {
+                    String team = BedwarsPlugin.teams.get(event.getSlot());
+                    TeamDataFile.setGeneratorLocation(team, event.getWhoClicked().getLocation());
+                    event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le générateur de cette équipe à été correctement placé !");
+                } else if (event.getClick().isRightClick()) {
+                    Location generatorLocation = TeamDataFile.getGeneratorLocation(BedwarsPlugin.teams.get(event.getSlot()));
+                    if (generatorLocation.getX() + generatorLocation.getY() != 0) {
+                        TeamDataFile.setGeneratorLocation(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le générateur de cette équipe à été correctement retiré !");
+                    }
+                }
+                event.getWhoClicked().openInventory(GuiGenerators.Gui());
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set Diamond generator")) {
+            if (event.getSlot() < 8) {
+                if (event.getClick().isLeftClick()) {
+                    GeneratorDataFile.addGenerator("Diamond", event.getWhoClicked().getLocation());
+                    event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été placé !");
+                } else if (event.getClick().isRightClick()) {
+                    if (GeneratorDataFile.getGenerators("Diamond").size() >= event.getSlot() + 2) {
+                        Location generatorLocation = GeneratorDataFile.getGeneratorLocation("Diamond", GeneratorDataFile.getGenerators("Diamond").get(event.getSlot() + 1));
+                        GeneratorDataFile.removeGenerator("Diamond", generatorLocation);
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été retiré !");
+                    }
+                }
+                event.getWhoClicked().openInventory(GuiDiamondGen.Gui());
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("Teams View")) {
+            event.setCancelled(true);
         }
     }
 }

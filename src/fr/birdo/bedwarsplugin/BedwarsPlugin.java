@@ -1,5 +1,6 @@
 package fr.birdo.bedwarsplugin;
 
+import fr.birdo.bedwarsplugin.utils.GeneratorDataFile;
 import fr.birdo.bedwarsplugin.utils.PlayerDataFile;
 import fr.birdo.bedwarsplugin.utils.TeamDataFile;
 import org.bukkit.Bukkit;
@@ -16,8 +17,10 @@ public class BedwarsPlugin extends JavaPlugin {
 
     public static String playerDataFolderPath;
     public static String teamDataFolderPath;
+    public static String generatorDataFolderPath;
     private static final List<String> folders = new ArrayList<>();
     public static final List<String> teams = Arrays.asList("Red", "Blue", "Green", "Yellow", "Aqua", "White", "Pink", "Gray");
+    public static final List<String> generators = Arrays.asList("Diamond", "Emerald");
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Events(this), (this));
@@ -25,19 +28,13 @@ public class BedwarsPlugin extends JavaPlugin {
         saveDefaultConfig();
         playerDataFolderPath = getDataFolder().getAbsolutePath() + "/PlayerData";
         teamDataFolderPath = getDataFolder().getAbsolutePath() + "/TeamData";
+        generatorDataFolderPath = getDataFolder().getAbsolutePath() + "/GeneratorData";
         folders.add(playerDataFolderPath);
         folders.add(teamDataFolderPath);
+        folders.add(generatorDataFolderPath);
         for (String folderName : folders) {
             File folder = new File(folderName);
-            if (folder.exists() && folder.list().length > 0) {
-                String files[] = folder.list();
-                for (String tmp : files) {
-                    File file = new File(folder, tmp);
-                    file.delete();
-                }
-                if (folder.list().length == 0)
-                    folder.delete();
-            } else
+            if (!folder.exists())
                 folder.mkdir();
         }
         if (!Bukkit.getOnlinePlayers().isEmpty())
@@ -63,23 +60,19 @@ public class BedwarsPlugin extends JavaPlugin {
                 }
             }
         }
+        for (String gen : generators) {
+            File generatorDataFile = new File(BedwarsPlugin.generatorDataFolderPath + "/" + gen + ".yml");
+            if (!generatorDataFile.exists()) {
+                try {
+                    generatorDataFile.createNewFile();
+                    GeneratorDataFile.createSections(gen);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 
     public void onDisable() {
-        for (String folderName : folders) {
-            File folder = new File(folderName);
-            if (folder.exists())
-                if (folder.list().length == 0)
-                    folder.delete();
-                else {
-                    String files[] = folder.list();
-                    for (String tmp : files) {
-                        File file = new File(folder, tmp);
-                        file.delete();
-                    }
-                    if (folder.list().length == 0)
-                        folder.delete();
-                }
-        }
     }
 }

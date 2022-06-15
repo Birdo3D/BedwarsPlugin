@@ -181,8 +181,8 @@ public class Utils {
 
     public static void launchGame() {
         for (String team : BedwarsPlugin.teams) {
-            if (!TeamDataFile.getPlayers(team).isEmpty()) {
-                TeamDataFile.setBed(team, true);
+            if (TeamDataFile.getPlayers(team).isEmpty()) {
+                TeamDataFile.setBed(team, false);
             }
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -191,7 +191,6 @@ public class Utils {
                 player.teleport(TeamDataFile.getSpawnLocation(PlayerDataFile.getTeam(player)));
             } else {
                 player.setGameMode(GameMode.SPECTATOR);
-                player.teleport(new Location(player.getWorld(), 0, 64, 0));
             }
         }
     }
