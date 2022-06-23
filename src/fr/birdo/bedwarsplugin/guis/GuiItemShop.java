@@ -1,5 +1,6 @@
-package fr.birdo.bedwarsplugin;
+package fr.birdo.bedwarsplugin.guis;
 
+import fr.birdo.bedwarsplugin.data.PlayerDataFile;
 import fr.birdo.bedwarsplugin.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Gui {
+public class GuiItemShop {
 
     private static final int[] pattern = new int[]{10, 11, 12, 13, 14, 15, 16};
     private static final Map<Integer, Item> itemsBlocks = new HashMap<>();

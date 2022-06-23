@@ -1,6 +1,8 @@
-package fr.birdo.bedwarsplugin.utils;
+package fr.birdo.bedwarsplugin.data;
 
 import fr.birdo.bedwarsplugin.BedwarsPlugin;
+import fr.birdo.bedwarsplugin.utils.ArmorTypes;
+import fr.birdo.bedwarsplugin.utils.ToolsTypes;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package fr.birdo.bedwarsplugin.utils;
+package fr.birdo.bedwarsplugin.data;
 
 import fr.birdo.bedwarsplugin.BedwarsPlugin;
 import org.bukkit.Bukkit;

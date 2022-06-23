@@ -1,5 +1,8 @@
 package fr.birdo.bedwarsplugin;
 
+import fr.birdo.bedwarsplugin.data.GeneratorDataFile;
+import fr.birdo.bedwarsplugin.data.PlayerDataFile;
+import fr.birdo.bedwarsplugin.data.TeamDataFile;
 import fr.birdo.bedwarsplugin.guis.*;
 import fr.birdo.bedwarsplugin.utils.*;
 import org.bukkit.*;
@@ -25,7 +28,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +51,13 @@ public class Events implements Listener {
                         if (args[2].equalsIgnoreCase("pnj")) {
                             ItemStack egg = new ItemStack(Material.EGG, 1);
                             ItemMeta eggM = egg.getItemMeta();
-                            eggM.setDisplayName("Classic PNJ Spawn Egg");
+                            eggM.setDisplayName("Item Shop PNJ Spawn Egg");
+                            egg.setItemMeta(eggM);
+                            e.getPlayer().getInventory().addItem(egg);
+                        } else if (args[2].equalsIgnoreCase("pnj2")) {
+                            ItemStack egg = new ItemStack(Material.EGG, 1);
+                            ItemMeta eggM = egg.getItemMeta();
+                            eggM.setDisplayName("Team's upgrades PNJ Spawn Egg");
                             egg.setItemMeta(eggM);
                             e.getPlayer().getInventory().addItem(egg);
                         }
@@ -57,10 +65,8 @@ public class Events implements Listener {
                 } else if (args[1].equalsIgnoreCase("launch")) {
                     Utils.launchGame();
                     Bukkit.broadcastMessage(ChatColor.GREEN + "Lancement de la partie !");
-                } else if (args[1].equalsIgnoreCase("diamond")) {
-                    e.getPlayer().openInventory(GuiDiamondGen.Gui());
                 } else if (args[1].equalsIgnoreCase("generators")) {
-                    e.getPlayer().openInventory(GuiGenerators.Gui());
+                    e.getPlayer().openInventory(GuiGenerators.choseGui());
                 } else if (args[1].equalsIgnoreCase("teams")) {
                     e.getPlayer().openInventory(GuiTeams.Gui());
                 } else if (args[1].equalsIgnoreCase("set")) {
@@ -91,13 +97,15 @@ public class Events implements Listener {
                 } else if (args[1].equalsIgnoreCase("spawns")) {
                     e.getPlayer().openInventory(GuiSpawns.Gui());
                 } else if (args[1].equalsIgnoreCase("help")) {
-                    e.getPlayer().sendMessage("Commandes disponibles :");
+                    e.getPlayer().sendMessage("BedwarsPlugin Commands :");
                     e.getPlayer().sendMessage("- /bw give pnj");
+                    e.getPlayer().sendMessage("- /bw give pnj2");
                     e.getPlayer().sendMessage("- /bw launch");
                     e.getPlayer().sendMessage("- /bw set 'player' 'team'");
                     e.getPlayer().sendMessage("- /bw remove 'player'");
                     e.getPlayer().sendMessage("- /bw beds");
                     e.getPlayer().sendMessage("- /bw teams");
+                    e.getPlayer().sendMessage("- /bw generators");
                     e.getPlayer().sendMessage("- /bw spawns");
                     e.getPlayer().sendMessage("- /bw help");
                     e.getPlayer().sendMessage("- /bw test");
@@ -116,9 +124,12 @@ public class Events implements Listener {
             double z = e.getClickedBlock().getLocation().getZ() + 0.5;
             if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
                 if (e.getItem() != null && e.getItem().getType() == Material.EGG) {
-                    if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName() && e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Classic PNJ Spawn Egg")) {
+                    if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName() && e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Item Shop PNJ Spawn Egg")) {
                         e.setCancelled(true);
                         e.getPlayer().getWorld().spawnEntity(new Location(e.getPlayer().getLocation().getWorld(), x, y, z), EntityType.VILLAGER).setCustomName("Item Shop");
+                    } else if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName() && e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Team's upgrades PNJ Spawn Egg")) {
+                        e.setCancelled(true);
+                        e.getPlayer().getWorld().spawnEntity(new Location(e.getPlayer().getLocation().getWorld(), x, y, z), EntityType.VILLAGER).setCustomName("Team Upgrades");
                     }
                 }
             }
@@ -131,7 +142,10 @@ public class Events implements Listener {
             if (!e.getPlayer().isSneaking())
                 if (e.getRightClicked().getCustomName().equalsIgnoreCase("Item Shop")) {
                     e.setCancelled(true);
-                    Gui.pnj01(e.getPlayer(), "Blocks");
+                    GuiItemShop.pnj01(e.getPlayer(), "Blocks");
+                } else if (e.getRightClicked().getCustomName().equalsIgnoreCase("Team Upgrades")) {
+                    e.setCancelled(true);
+                    //GuiItemShop.pnj01(e.getPlayer(), "Blocks");
                 }
     }
 
@@ -145,9 +159,9 @@ public class Events implements Listener {
                     if (e.getCurrentItem().getItemMeta().getDisplayName().length() > 1) {
                         String itemName = e.getCurrentItem().getItemMeta().getDisplayName().substring(2);
                         if (itemName.equalsIgnoreCase("Blocks") || itemName.equalsIgnoreCase("Weapons") || itemName.equalsIgnoreCase("Armors") || itemName.equalsIgnoreCase("Tools") || itemName.equalsIgnoreCase("Bows") || itemName.equalsIgnoreCase("Potions") || itemName.equalsIgnoreCase("Other"))
-                            Gui.pnj01((Player) e.getWhoClicked(), itemName);
-                        if (Gui.getItems(inv).get(e.getSlot()) != null)
-                            Utils.buyItem((Player) e.getWhoClicked(), Gui.getItems(inv).get(e.getSlot()));
+                            GuiItemShop.pnj01((Player) e.getWhoClicked(), itemName);
+                        if (GuiItemShop.getItems(inv).get(e.getSlot()) != null)
+                            Utils.buyItem((Player) e.getWhoClicked(), GuiItemShop.getItems(inv).get(e.getSlot()));
                     }
                 e.setCancelled(true);
             }
@@ -364,9 +378,54 @@ public class Events implements Listener {
     }
 
     public static void ticking(Plugin plugin) {
+        int ironTime = instance.getConfig().getInt("ores.iron") * 20;
+        int goldTime = instance.getConfig().getInt("ores.gold") * 20;
+        int diamondTime = instance.getConfig().getInt("ores.diamond") * 20;
+        int emeraldTime = instance.getConfig().getInt("ores.emerald") * 20;
+        //Inventory Ticking
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             checkInventory();
         }, 0L, 1L);
+        //Iron generators
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+            for (String team : BedwarsPlugin.teams) {
+                Location location = TeamDataFile.getGeneratorLocation(team);
+                Location generateLocation = new Location(location.getWorld(), location.getX() - 0.5, location.getY() + 0.5, location.getZ() - 0.5);
+                if (location.getX() + location.getY() != 0) {
+                    location.getWorld().dropItem(generateLocation, new ItemStack(Material.IRON_INGOT));
+                }
+            }
+        }, 0L, ironTime);
+        //Gold generators
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+            for (String team : BedwarsPlugin.teams) {
+                Location location = TeamDataFile.getGeneratorLocation(team);
+                Location generateLocation = new Location(location.getWorld(), location.getX() - 0.5, location.getY() + 0.5, location.getZ() - 0.5);
+                if (location.getX() + location.getY() != 0) {
+                    location.getWorld().dropItem(generateLocation, new ItemStack(Material.GOLD_INGOT));
+                }
+            }
+        }, 0L, goldTime);
+        //Diamond generators
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+            for (int i = 1; i < 9; i++) {
+                Location location = GeneratorDataFile.getGenerator("Diamond", i);
+                Location generateLocation = new Location(location.getWorld(), location.getX() - 0.5, location.getY() + 0.5, location.getZ() - 0.5);
+                if (location.getX() + location.getY() != 0) {
+                    location.getWorld().dropItem(generateLocation, new ItemStack(Material.DIAMOND));
+                }
+            }
+        }, 0L, diamondTime);
+        //Emerald generators
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+            for (int i = 1; i < 9; i++) {
+                Location location = GeneratorDataFile.getGenerator("Emerald", i);
+                Location generateLocation = new Location(location.getWorld(), location.getX() - 0.5, location.getY() + 0.5, location.getZ() - 0.5);
+                if (location.getX() + location.getY() != 0) {
+                    location.getWorld().dropItem(generateLocation, new ItemStack(Material.EMERALD));
+                }
+            }
+        }, 0L, emeraldTime);
     }
 
     private static void checkInventory() {
@@ -464,7 +523,7 @@ public class Events implements Listener {
                 event.getWhoClicked().openInventory(GuiSpawns.Gui());
             }
             event.setCancelled(true);
-        } else if (event.getView().getTitle().equalsIgnoreCase("Set team generator")) {
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set team's generator")) {
             if (event.getSlot() < 8) {
                 if (event.getClick().isLeftClick()) {
                     String team = BedwarsPlugin.teams.get(event.getSlot());
@@ -477,22 +536,59 @@ public class Events implements Listener {
                         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le générateur de cette équipe à été correctement retiré !");
                     }
                 }
-                event.getWhoClicked().openInventory(GuiGenerators.Gui());
+                event.getWhoClicked().openInventory(GuiGenerators.teamGui());
+            } else {
+                event.getWhoClicked().openInventory(GuiGenerators.choseGui());
             }
             event.setCancelled(true);
-        } else if (event.getView().getTitle().equalsIgnoreCase("Set Diamond generator")) {
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set diamond generators")) {
             if (event.getSlot() < 8) {
                 if (event.getClick().isLeftClick()) {
-                    GeneratorDataFile.addGenerator("Diamond", event.getWhoClicked().getLocation());
+                    GeneratorDataFile.setGenerator("Diamond", event.getSlot() + 1, event.getWhoClicked().getLocation());
                     event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été placé !");
                 } else if (event.getClick().isRightClick()) {
-                    if (GeneratorDataFile.getGenerators("Diamond").size() >= event.getSlot() + 2) {
-                        Location generatorLocation = GeneratorDataFile.getGeneratorLocation("Diamond", GeneratorDataFile.getGenerators("Diamond").get(event.getSlot() + 1));
-                        GeneratorDataFile.removeGenerator("Diamond", generatorLocation);
+                    Location generatorLocation = GeneratorDataFile.getGenerator("Diamond", event.getSlot() + 1);
+                    if (generatorLocation.getX() + generatorLocation.getY() != 0) {
+                        GeneratorDataFile.setGenerator("Diamond", event.getSlot() + 1, new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
                         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été retiré !");
                     }
                 }
-                event.getWhoClicked().openInventory(GuiDiamondGen.Gui());
+                event.getWhoClicked().openInventory(GuiGenerators.diamondGui());
+            } else {
+                event.getWhoClicked().openInventory(GuiGenerators.choseGui());
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("Set emerald generators")) {
+            if (event.getSlot() < 8) {
+                if (event.getClick().isLeftClick()) {
+                    GeneratorDataFile.setGenerator("Emerald", event.getSlot() + 1, event.getWhoClicked().getLocation());
+                    event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été placé !");
+                } else if (event.getClick().isRightClick()) {
+                    Location generatorLocation = GeneratorDataFile.getGenerator("Emerald", event.getSlot() + 1);
+                    if (generatorLocation.getX() + generatorLocation.getY() != 0) {
+                        GeneratorDataFile.setGenerator("Emerald", event.getSlot() + 1, new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Ce générateur a correctement été retiré !");
+                    }
+                }
+                event.getWhoClicked().openInventory(GuiGenerators.emeraldGui());
+            } else {
+                event.getWhoClicked().openInventory(GuiGenerators.choseGui());
+            }
+            event.setCancelled(true);
+        } else if (event.getView().getTitle().equalsIgnoreCase("What generator do you want ?")) {
+            switch (event.getSlot()) {
+                case 11:
+                    event.getWhoClicked().openInventory(GuiGenerators.teamGui());
+                    break;
+                case 13:
+                    event.getWhoClicked().openInventory(GuiGenerators.diamondGui());
+                    break;
+                case 15:
+                    event.getWhoClicked().openInventory(GuiGenerators.emeraldGui());
+                    break;
+                case 26:
+                    event.getWhoClicked().closeInventory();
+                    break;
             }
             event.setCancelled(true);
         } else if (event.getView().getTitle().equalsIgnoreCase("Teams View")) {

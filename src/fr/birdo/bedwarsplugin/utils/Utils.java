@@ -1,7 +1,9 @@
 package fr.birdo.bedwarsplugin.utils;
 
 import fr.birdo.bedwarsplugin.BedwarsPlugin;
-import fr.birdo.bedwarsplugin.Gui;
+import fr.birdo.bedwarsplugin.data.PlayerDataFile;
+import fr.birdo.bedwarsplugin.data.TeamDataFile;
+import fr.birdo.bedwarsplugin.guis.GuiItemShop;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -56,12 +58,12 @@ public class Utils {
                         }
                         PlayerDataFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getPickaxe(player) + 1)));
                         pay(item, player);
-                        Gui.pnj01(player, "Tools");
+                        GuiItemShop.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
                         player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         PlayerDataFile.setPickaxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getPickaxe(player) + 1)));
                         pay(item, player);
-                        Gui.pnj01(player, "Tools");
+                        GuiItemShop.pnj01(player, "Tools");
                     } else
                         player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
                 } else
@@ -78,12 +80,12 @@ public class Utils {
                         }
                         PlayerDataFile.setAxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getAxe(player) + 1)));
                         pay(item, player);
-                        Gui.pnj01(player, "Tools");
+                        GuiItemShop.pnj01(player, "Tools");
                     } else if (hasPlace(item, player)) {
                         player.getInventory().addItem(Converter.convertToItemStack(item, false));
                         PlayerDataFile.setAxe(player, Objects.requireNonNull(getToolFromID(PlayerDataFile.getAxe(player) + 1)));
                         pay(item, player);
-                        Gui.pnj01(player, "Tools");
+                        GuiItemShop.pnj01(player, "Tools");
                     } else
                         player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
                 } else

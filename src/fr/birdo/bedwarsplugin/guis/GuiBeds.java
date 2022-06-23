@@ -1,7 +1,7 @@
 package fr.birdo.bedwarsplugin.guis;
 
 import fr.birdo.bedwarsplugin.BedwarsPlugin;
-import fr.birdo.bedwarsplugin.utils.TeamDataFile;
+import fr.birdo.bedwarsplugin.data.TeamDataFile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

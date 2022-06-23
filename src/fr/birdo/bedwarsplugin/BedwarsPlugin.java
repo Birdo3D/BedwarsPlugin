@@ -1,8 +1,8 @@
 package fr.birdo.bedwarsplugin;
 
-import fr.birdo.bedwarsplugin.utils.GeneratorDataFile;
-import fr.birdo.bedwarsplugin.utils.PlayerDataFile;
-import fr.birdo.bedwarsplugin.utils.TeamDataFile;
+import fr.birdo.bedwarsplugin.data.GeneratorDataFile;
+import fr.birdo.bedwarsplugin.data.PlayerDataFile;
+import fr.birdo.bedwarsplugin.data.TeamDataFile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,7 +65,7 @@ public class BedwarsPlugin extends JavaPlugin {
             if (!generatorDataFile.exists()) {
                 try {
                     generatorDataFile.createNewFile();
-                    GeneratorDataFile.createSections(gen);
+                    GeneratorDataFile.createSections();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
