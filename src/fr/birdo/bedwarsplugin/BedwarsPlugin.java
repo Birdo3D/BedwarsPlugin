@@ -20,6 +20,7 @@ public class BedwarsPlugin extends JavaPlugin {
     public static String generatorDataFolderPath;
     private static final List<String> folders = new ArrayList<>();
     public static final List<String> teams = Arrays.asList("Red", "Blue", "Green", "Yellow", "Aqua", "White", "Pink", "Gray");
+    public static final List<Integer> bytes = Arrays.asList(14, 11, 13, 4, 9, 0, 2, 8);
     public static final List<String> generators = Arrays.asList("Diamond", "Emerald");
 
     public void onEnable() {

@@ -100,6 +100,22 @@ public class Utils {
                         player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
                 } else
                     player.sendMessage(ChatColor.RED + "You already own this item !");
+            } else if (item.getMaterial() == Material.WOOL) {
+                if (hasPlace(item, player)) {
+                    boolean team = false;
+                    for (int i = 0; i < 8; i++) {
+                        if (PlayerDataFile.getTeam(player).equalsIgnoreCase(BedwarsPlugin.teams.get(i))) {
+                            ItemStack stack = Converter.convertToItemStack(item, false).clone();
+                            stack.setDurability(BedwarsPlugin.bytes.get(i).byteValue());
+                            player.getInventory().addItem(stack);
+                            team = true;
+                        } else if (i == 7 && !team) {
+                            player.getInventory().addItem(Converter.convertToItemStack(item, false));
+                        }
+                    }
+                    pay(item, player);
+                } else
+                    player.sendMessage(ChatColor.RED + "You don't have enough place in your inventory !");
             } else {
                 if (hasPlace(item, player)) {
                     pay(item, player);
@@ -142,6 +158,18 @@ public class Utils {
                 nb_sell = nb_sell - items.get(i);
                 i++;
             }
+        }
+    }
+
+    public static boolean hasMoney(Player player, Material moneyMaterial, int count) {
+        int moneyAmount = 0;
+        for (int i = 0; i < 36; i++)
+            if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == moneyMaterial)
+                moneyAmount = moneyAmount + player.getInventory().getItem(i).getAmount();
+        if (moneyAmount >= count) {
+            return true;
+        } else {
+            return false;
         }
     }
 

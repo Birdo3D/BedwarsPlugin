@@ -145,7 +145,7 @@ public class Events implements Listener {
                     GuiItemShop.pnj01(e.getPlayer(), "Blocks");
                 } else if (e.getRightClicked().getCustomName().equalsIgnoreCase("Team Upgrades")) {
                     e.setCancelled(true);
-                    //GuiItemShop.pnj01(e.getPlayer(), "Blocks");
+                    e.getPlayer().openInventory(GuiTeamUpgrades.guiTeamUpgrades(e.getPlayer()));
                 }
     }
 
