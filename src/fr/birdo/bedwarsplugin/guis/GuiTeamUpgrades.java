@@ -8,10 +8,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GuiTeamUpgrades {
 
@@ -23,33 +25,39 @@ public class GuiTeamUpgrades {
                 case 10:
                     ItemStack sharpnessItem = new ItemStack(Material.IRON_SWORD, 1);
                     ItemMeta sharpnessItemMeta = sharpnessItem.getItemMeta();
-                    if (TeamDataFile.hasSharpness(PlayerDataFile.getTeam(player))) {
-                        sharpnessItemMeta.setDisplayName(ChatColor.RED + "Sharpened Swords");
-                        if (Utils.hasMoney(player, Material.DIAMOND, 8)) {
-                            sharpnessItemMeta.setLore(Arrays.asList("Your team permanently gains", "Sharpness I on all swords and", "axes !", " ", "Cost: " + ChatColor.AQUA + "8 Diamonds", " ", ChatColor.RED + "You don't have enough Diamonds!"));
-                        } else {
-                            sharpnessItemMeta.setLore(Arrays.asList("Your team permanently gains", "Sharpness I on all swords and", "axes !", " ", "Cost: " + ChatColor.AQUA + "8 Diamonds", " ", ChatColor.RED + "You don't have enough Diamonds!"));
-                        }
-                    } else {
-                        sharpnessItemMeta.setDisplayName(ChatColor.GREEN + "Sharpened Swords");
-                        sharpnessItemMeta.setLore(Arrays.asList("Your team permanently gains", "Sharpness I on all swords and", "axes !", " ", "Cost: " + ChatColor.AQUA + "8 Diamonds", " ", ChatColor.RED + "You don't have enough Diamonds!"));
-                    }
+                    sharpnessItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    int sharpnessPrice = 4;
+                    int sharpnessAction = getAction(player, TeamDataFile.hasSharpness(PlayerDataFile.getTeam(player)), 0, sharpnessPrice);
+                    sharpnessItemMeta.setDisplayName(getName("Sharpened Swords", sharpnessAction));
+                    sharpnessItemMeta.setLore(Arrays.asList(ChatColor.GRAY + "Your team permanently gains", ChatColor.GRAY + "Sharpness I on all swords and", ChatColor.GRAY + "axes !", " ", ChatColor.GRAY + "Cost: " + ChatColor.AQUA + sharpnessPrice + " Diamonds", " ", getLore(sharpnessAction)));
                     sharpnessItem.setItemMeta(sharpnessItemMeta);
                     inventory.setItem(i, sharpnessItem);
                     break;
                 //Protection
                 case 11:
-                    ItemStack protectionItem = new ItemStack(Material.IRON_CHESTPLATE, 1);
+                    int protectionLevel = TeamDataFile.getProtection(PlayerDataFile.getTeam(player));
+                    ItemStack protectionItem = new ItemStack(Material.IRON_CHESTPLATE, protectionLevel + 1);
                     ItemMeta protectionItemMeta = protectionItem.getItemMeta();
-                    protectionItemMeta.setDisplayName(" ");
+                    protectionItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    List<Integer> protectionPrice = Arrays.asList(2, 4, 8, 16);
+                    int protectionAction = getAction(player, protectionLevel > 0, 4, protectionPrice.get(protectionLevel));
+                    protectionItemMeta.setDisplayName(getName("Reinforced Armor " + Utils.integerToRomanNumeral(protectionLevel + 1), protectionAction));
+                    String protectionName = "Protection";
+                    protectionItemMeta.setLore(Arrays.asList(ChatColor.GRAY + "Your team permanently gains", ChatColor.GRAY + "Protection on all armor pieces!", " ", getTierLore(protectionName, 1, protectionLevel, protectionPrice.get(0)), getTierLore(protectionName, 2, protectionLevel, protectionPrice.get(1)), getTierLore(protectionName, 3, protectionLevel, protectionPrice.get(2)), getTierLore(protectionName, 4, protectionLevel, protectionPrice.get(3)), " ", getLore(protectionAction)));
                     protectionItem.setItemMeta(protectionItemMeta);
                     inventory.setItem(i, protectionItem);
                     break;
                 //Haste
                 case 12:
+                    int hasteLevel = TeamDataFile.getProtection(PlayerDataFile.getTeam(player));
+                    List<Integer> hastePrice = Arrays.asList(2, 4);
                     ItemStack hasteItem = new ItemStack(Material.GOLD_PICKAXE, 1);
                     ItemMeta hasteItemMeta = hasteItem.getItemMeta();
-                    hasteItemMeta.setDisplayName(" ");
+                    hasteItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    int hasteAction = getAction(player, hasteLevel > 0, 4, hastePrice.get(hasteLevel));
+                    hasteItemMeta.setDisplayName(getName("Maniac Miner " + Utils.integerToRomanNumeral(hasteLevel + 1), hasteAction));
+                    String hasteName = "Haste";
+                    hasteItemMeta.setLore(Arrays.asList(ChatColor.GRAY + "All players on your team", ChatColor.GRAY + "permanently gain Haste.", " ", getTierLore(hasteName, 1, hasteLevel, hastePrice.get(0)), getTierLore(hasteName, 2, hasteLevel, hastePrice.get(1)), " ", getLore(hasteAction)));
                     hasteItem.setItemMeta(hasteItemMeta);
                     inventory.setItem(i, hasteItem);
                     break;
@@ -160,5 +168,44 @@ public class GuiTeamUpgrades {
             }
         }
         return inventory;
+    }
+
+    private static int getAction(Player player, boolean hasUpgrade, int maxLevel, int price) {
+        if (!hasUpgrade || maxLevel > 0)
+            if (Utils.hasMoney(player, Material.DIAMOND, price))
+                return 1;
+            else
+                return 0;
+        else
+            return 2;
+    }
+
+    private static String getName(String name, int action) {
+        switch (action) {
+            case 1:
+                return ChatColor.YELLOW + name;
+            case 2:
+                return ChatColor.GREEN + name;
+            default:
+                return ChatColor.RED + name;
+        }
+    }
+
+    private static String getTierLore(String name, int i, int level, int price) {
+        if (i <= level)
+            return ChatColor.GREEN + "Tier " + i + ": " + name + " " + Utils.integerToRomanNumeral(i) + "," + " " + ChatColor.AQUA + price + " Diamonds";
+        else
+            return ChatColor.GRAY + "Tier " + i + ": " + name + " " + Utils.integerToRomanNumeral(i) + "," + " " + ChatColor.AQUA + price + " Diamonds";
+    }
+
+    private static String getLore(int action) {
+        switch (action) {
+            case 1:
+                return ChatColor.YELLOW + "Click to purchase!";
+            case 2:
+                return ChatColor.GREEN + "UNLOCKED";
+            default:
+                return ChatColor.RED + "You don't have enough Diamonds!";
+        }
     }
 }
