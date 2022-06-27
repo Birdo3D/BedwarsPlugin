@@ -13,7 +13,7 @@ import java.util.List;
 
 public class GuiScoreboard {
 
-    public static void getScoreboard(Player player) {
+    public static void getScoreboard(Player player, int time) {
 
         ScoreboardManager m = Bukkit.getScoreboardManager();
         Scoreboard b = m.getNewScoreboard();

@@ -24,6 +24,9 @@ public class BedwarsPlugin extends JavaPlugin {
     public static final List<ChatColor> chatcolors = Arrays.asList(ChatColor.RED, ChatColor.BLUE, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE, ChatColor.LIGHT_PURPLE, ChatColor.GRAY);
     public static final List<Integer> bytes = Arrays.asList(14, 11, 13, 4, 9, 0, 2, 8);
     public static final List<String> generators = Arrays.asList("Diamond", "Emerald");
+    public static final List<String> events = Arrays.asList("Diamond II", "Emerald II", "Diamond III", "Emerald III", "Beds Destruction", "Sudden Death", "Game Over");
+    public static int event = 0;
+    public static boolean isLaunch = false;
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Events(this), (this));

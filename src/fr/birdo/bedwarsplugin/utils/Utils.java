@@ -210,6 +210,7 @@ public class Utils {
     }
 
     public static void launchGame() {
+        BedwarsPlugin.isLaunch = true;
         for (String team : BedwarsPlugin.teams) {
             if (TeamDataFile.getPlayers(team).isEmpty()) {
                 TeamDataFile.setBed(team, false);

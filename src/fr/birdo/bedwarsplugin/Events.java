@@ -41,6 +41,7 @@ public class Events implements Listener {
     }
 
     private final Map<Player, Block> clickedBlock = new HashMap<>();
+    private static int time = 0;
 
     @EventHandler
     public void commandSendEvent(PlayerCommandPreprocessEvent e) {
@@ -185,7 +186,6 @@ public class Events implements Listener {
             PlayerDataFile.createSections(e.getPlayer());
             setupInventory(e.getPlayer());
         }
-        GuiScoreboard.getScoreboard(e.getPlayer());
     }
 
     @EventHandler
@@ -388,6 +388,39 @@ public class Events implements Listener {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             checkInventory();
         }, 0L, 1L);
+        //Events
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            if (BedwarsPlugin.isLaunch) {
+                time++;
+                if (time < 6 * 60) {//Nothing
+                    if (BedwarsPlugin.event != 0)
+                        BedwarsPlugin.event = 0;
+                } else if (time < 12 * 60) {//Diamond II
+                    if (BedwarsPlugin.event != 1)
+                        BedwarsPlugin.event = 1;
+                } else if (time < 24 * 60) {//Emerald II
+                    if (BedwarsPlugin.event != 2)
+                        BedwarsPlugin.event = 2;
+                } else if (time < 30 * 60) {//Diamond III
+                    if (BedwarsPlugin.event != 3)
+                        BedwarsPlugin.event = 3;
+                } else if (time < 36 * 60) {//Emerald III
+                    if (BedwarsPlugin.event != 4)
+                        BedwarsPlugin.event = 4;
+                } else if (time < 42 * 60) {//Beds Destruction
+                    if (BedwarsPlugin.event != 5)
+                        BedwarsPlugin.event = 5;
+                } else if (time < 52 * 60) {//Sudden death
+                    if (BedwarsPlugin.event != 6)
+                        BedwarsPlugin.event = 6;
+                } else {//Game Over
+                    if (BedwarsPlugin.event != 7)
+                        BedwarsPlugin.event = 7;
+                }
+                for (Player player : Bukkit.getOnlinePlayers())
+                    GuiScoreboard.getScoreboard(player, time);
+            }
+        }, 0L, 20L);
         //Iron generators
         Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
             for (String team : BedwarsPlugin.teams) {
