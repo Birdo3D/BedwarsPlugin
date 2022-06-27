@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Bed;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -184,6 +185,7 @@ public class Events implements Listener {
             PlayerDataFile.createSections(e.getPlayer());
             setupInventory(e.getPlayer());
         }
+        GuiScoreboard.getScoreboard(e.getPlayer());
     }
 
     @EventHandler

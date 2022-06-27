@@ -42,6 +42,24 @@ public class PlayerDataFile {
         saveFile(cfg, player);
     }
 
+    public static void setKills(Player player, int kills) {
+        FileConfiguration cfg = getConfigFile(player);
+        cfg.set("Stats.kills", kills);
+        saveFile(cfg, player);
+    }
+
+    public static void setFinalKills(Player player, int kills) {
+        FileConfiguration cfg = getConfigFile(player);
+        cfg.set("Stats.f_kills", kills);
+        saveFile(cfg, player);
+    }
+
+    public static void setBeds(Player player, int beds) {
+        FileConfiguration cfg = getConfigFile(player);
+        cfg.set("Stats.beds", beds);
+        saveFile(cfg, player);
+    }
+
     public static int getArmorType(Player player) {
         return getConfigFile(player).getInt("ArmorType");
     }
@@ -62,6 +80,18 @@ public class PlayerDataFile {
         return getConfigFile(player).getString("Team");
     }
 
+    public static String getKills(Player player) {
+        return getConfigFile(player).getString("Stats.kills");
+    }
+
+    public static String getFinalKills(Player player) {
+        return getConfigFile(player).getString("Stats.f_kills");
+    }
+
+    public static String getBeds(Player player) {
+        return getConfigFile(player).getString("Stats.beds");
+    }
+
     public static void createSections(Player player) {
         FileConfiguration cfg = getConfigFile(player);
         cfg.set("ArmorType", ArmorTypes.LEATHER.getIndex());
@@ -69,6 +99,9 @@ public class PlayerDataFile {
         cfg.set("Tools.axe", ToolsTypes.NULL.getIndex());
         cfg.set("Tools.shears", false);
         cfg.set("Team", "null");
+        cfg.set("Stats.kills", 0);
+        cfg.set("Stats.f_kills", 0);
+        cfg.set("Stats.beds", 0);
         saveFile(cfg, player);
     }
 

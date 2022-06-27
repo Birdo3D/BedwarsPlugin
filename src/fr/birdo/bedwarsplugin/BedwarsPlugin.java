@@ -4,6 +4,7 @@ import fr.birdo.bedwarsplugin.data.GeneratorDataFile;
 import fr.birdo.bedwarsplugin.data.PlayerDataFile;
 import fr.birdo.bedwarsplugin.data.TeamDataFile;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +21,7 @@ public class BedwarsPlugin extends JavaPlugin {
     public static String generatorDataFolderPath;
     private static final List<String> folders = new ArrayList<>();
     public static final List<String> teams = Arrays.asList("Red", "Blue", "Green", "Yellow", "Aqua", "White", "Pink", "Gray");
+    public static final List<ChatColor> chatcolors = Arrays.asList(ChatColor.RED, ChatColor.BLUE, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE, ChatColor.LIGHT_PURPLE, ChatColor.GRAY);
     public static final List<Integer> bytes = Arrays.asList(14, 11, 13, 4, 9, 0, 2, 8);
     public static final List<String> generators = Arrays.asList("Diamond", "Emerald");
 
