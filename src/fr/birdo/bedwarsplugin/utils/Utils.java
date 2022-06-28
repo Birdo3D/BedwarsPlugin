@@ -210,19 +210,44 @@ public class Utils {
     }
 
     public static void launchGame() {
-        BedwarsPlugin.isLaunch = true;
+        boolean launch = true;
+        int teamWithPlayers = 0;
         for (String team : BedwarsPlugin.teams) {
-            if (TeamDataFile.getPlayers(team).isEmpty()) {
+            for (String p : TeamDataFile.getPlayers(team))
+                if (!Bukkit.getPlayer(p).isOnline())
+                    TeamDataFile.removePlayer(team, Bukkit.getPlayer(p));
+            if (!TeamDataFile.getPlayers(team).isEmpty()) {
+                teamWithPlayers++;
+                if (!TeamDataFile.hasBed(team)) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "Error: " + team + " team does not have bed!");
+                    launch = false;
+                } else if (!TeamDataFile.hasSpawn(team)) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "Error: " + team + " team does not have spawn point!");
+                    launch = false;
+                } else if (!TeamDataFile.hasGenerator(team)) {
+                    Bukkit.broadcastMessage(ChatColor.RED + "Error: " + team + " team does not have generator!");
+                    launch = false;
+                }
+            } else {
                 TeamDataFile.setBed(team, false);
             }
         }
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
-                player.setGameMode(GameMode.SURVIVAL);
-                player.teleport(TeamDataFile.getSpawnLocation(PlayerDataFile.getTeam(player)));
-            } else {
-                player.setGameMode(GameMode.SPECTATOR);
+        if (teamWithPlayers < 2) {
+            Bukkit.broadcastMessage(ChatColor.RED + "Error: There are not enough teams!");
+            launch = false;
+        }
+        if (launch) {
+            BedwarsPlugin.isLaunch = true;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!PlayerDataFile.getTeam(player).equalsIgnoreCase("null")) {
+                    TeamDataFile.addLivePlayer(PlayerDataFile.getTeam(player), player);
+                    player.setGameMode(GameMode.SURVIVAL);
+                    player.teleport(TeamDataFile.getSpawnLocation(PlayerDataFile.getTeam(player)));
+                } else {
+                    player.setGameMode(GameMode.SPECTATOR);
+                }
             }
+            Bukkit.broadcastMessage(ChatColor.GREEN + "Launch Game!");
         }
     }
 

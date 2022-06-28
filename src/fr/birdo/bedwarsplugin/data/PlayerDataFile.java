@@ -80,16 +80,16 @@ public class PlayerDataFile {
         return getConfigFile(player).getString("Team");
     }
 
-    public static String getKills(Player player) {
-        return getConfigFile(player).getString("Stats.kills");
+    public static int getKills(Player player) {
+        return getConfigFile(player).getInt("Stats.kills");
     }
 
-    public static String getFinalKills(Player player) {
-        return getConfigFile(player).getString("Stats.f_kills");
+    public static int getFinalKills(Player player) {
+        return getConfigFile(player).getInt("Stats.f_kills");
     }
 
-    public static String getBeds(Player player) {
-        return getConfigFile(player).getString("Stats.beds");
+    public static int getBeds(Player player) {
+        return getConfigFile(player).getInt("Stats.beds");
     }
 
     public static void createSections(Player player) {

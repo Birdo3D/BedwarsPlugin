@@ -5,8 +5,10 @@ import fr.birdo.bedwarsplugin.data.PlayerDataFile;
 import fr.birdo.bedwarsplugin.data.TeamDataFile;
 import fr.birdo.bedwarsplugin.guis.*;
 import fr.birdo.bedwarsplugin.utils.*;
+import net.minecraft.server.v1_12_R1.PacketPlayInClientCommand;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +21,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +32,8 @@ import org.bukkit.scoreboard.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +71,6 @@ public class Events implements Listener {
                     }
                 } else if (args[1].equalsIgnoreCase("launch")) {
                     Utils.launchGame();
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "Lancement de la partie !");
                 } else if (args[1].equalsIgnoreCase("generators")) {
                     e.getPlayer().openInventory(GuiGenerators.choseGui());
                 } else if (args[1].equalsIgnoreCase("teams")) {
@@ -198,23 +202,99 @@ public class Events implements Listener {
             axe++;
         PlayerDataFile.setPickaxe(e.getEntity().getPlayer(), Utils.getToolFromID(pickaxe - 1));
         PlayerDataFile.setAxe(e.getEntity().getPlayer(), Utils.getToolFromID(axe - 1));
+        for (Material material : Arrays.asList(Material.IRON_INGOT, Material.GOLD_INGOT, Material.DIAMOND, Material.EMERALD)) {
+            int quantity = 0;
+            for (int i = 0; i < 36; i++) {
+                if (e.getEntity().getInventory().getItem(i) != null && e.getEntity().getInventory().getItem(i).getType() == material) {
+                    quantity = quantity + e.getEntity().getInventory().getItem(i).getAmount();
+                }
+            }
+            Inventory inventory = e.getEntity().getKiller().getInventory();
+            int place = 0;
+            for (int i = 0; i < 36; i++)
+                if (inventory.getItem(i) == null)
+                    place = place + 64;
+                else if (inventory.getItem(i).getType() == material)
+                    place = place + (material.getMaxStackSize() - inventory.getItem(i).getAmount());
+            int dropQuantity = quantity - place;
+            if (dropQuantity < 0)
+                dropQuantity = 0;
+            inventory.addItem(new ItemStack(material, quantity - dropQuantity));
+            e.getEntity().getWorld().dropItem(e.getEntity().getKiller().getLocation(), new ItemStack(material, dropQuantity));
+        }
         e.getDrops().clear();
         for (String team : BedwarsPlugin.teams)
             if (TeamDataFile.getPlayers(team).contains(e.getEntity().getName()))
                 TeamDataFile.removeLivePlayer(team, e.getEntity().getPlayer());
+        if (TeamDataFile.hasBed(PlayerDataFile.getTeam(e.getEntity())))
+            PlayerDataFile.setKills(e.getEntity().getKiller(), PlayerDataFile.getKills(e.getEntity().getKiller()) + 1);
+        else
+            PlayerDataFile.setFinalKills(e.getEntity().getKiller(), PlayerDataFile.getFinalKills(e.getEntity().getKiller()) + 1);
+        for (int i = 0; i < 8; i++)
+            if (BedwarsPlugin.teams.get(i).equalsIgnoreCase(PlayerDataFile.getTeam(e.getEntity().getKiller())))
+                for (int j = 0; j < 8; j++)
+                    if (BedwarsPlugin.teams.get(j).equalsIgnoreCase(PlayerDataFile.getTeam(e.getEntity())))
+                        if (TeamDataFile.hasBed(PlayerDataFile.getTeam(e.getEntity())))
+                            e.setDeathMessage(BedwarsPlugin.chatcolors.get(j) + e.getEntity().getName() + ChatColor.GRAY + " was killed by " + BedwarsPlugin.chatcolors.get(i) + e.getEntity().getKiller().getName() + ChatColor.GRAY + ".");
+                        else
+                            e.setDeathMessage(BedwarsPlugin.chatcolors.get(j) + e.getEntity().getName() + ChatColor.GRAY + " was killed by " + BedwarsPlugin.chatcolors.get(i) + e.getEntity().getKiller().getName() + ChatColor.GRAY + "." + ChatColor.AQUA + "" + ChatColor.BOLD + " FINAL KILL!");
+        final Player plr = e.getEntity();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
+            @Override
+            public void run() {
+                PacketPlayInClientCommand packet = new PacketPlayInClientCommand();
+                try {
+                    Field a = PacketPlayInClientCommand.class.getDeclaredField("a");
+                    a.setAccessible(true);
+                    a.set(packet, PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                ((CraftPlayer) plr).getHandle().playerConnection.a(packet);
+            }
+        }, 2L);
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
+        e.getPlayer().setGameMode(GameMode.SPECTATOR);
         for (String team : BedwarsPlugin.teams)
             if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName())) {
                 if (TeamDataFile.hasBed(team)) {
-                    TeamDataFile.addLivePlayer(team, e.getPlayer());
-                    setupInventory(e.getPlayer());
+                    e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "5" + ChatColor.YELLOW + " seconds!");
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "4" + ChatColor.YELLOW + " seconds!");
+                    }, 0L, 20);
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "3" + ChatColor.YELLOW + " seconds!");
+                    }, 0L, 2 * 20);
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "2" + ChatColor.YELLOW + " seconds!");
+                    }, 0L, 3 * 20);
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "1" + ChatColor.YELLOW + " seconds!");
+                    }, 0L, 4 * 20);
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().setGameMode(GameMode.SURVIVAL);
+                        TeamDataFile.addLivePlayer(team, e.getPlayer());
+                        e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
+                        setupInventory(e.getPlayer());
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You have respawned!");
+                    }, 0L, 5 * 20);
                 } else {
-                    e.getPlayer().setGameMode(GameMode.SPECTATOR);
+                    /*if (TeamDataFile.getLivePlayers(team).isEmpty()) {
+                        Bukkit.broadcastMessage(" ");
+                        Bukkit.broadcastMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "TEAM ELIMINATED > " + " Team" + ChatColor.RED+ " has been eliminated!");
+                        Bukkit.broadcastMessage(" ");
+                    }*/
+                    e.getPlayer().sendMessage(ChatColor.RED + "You have been eliminated!");
                 }
-                e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
             }
     }
 
@@ -224,10 +304,24 @@ public class Events implements Listener {
             for (String team : BedwarsPlugin.teams)
                 if (TeamDataFile.getBed1Location(team).equals(e.getBlock().getLocation()) || TeamDataFile.getBed2Location(team).equals(e.getBlock().getLocation())) {
                     if (!TeamDataFile.getPlayers(team).contains(e.getPlayer().getName())) {
+                        e.setDropItems(false);
                         TeamDataFile.setBed(team, false);
-                        Bukkit.broadcastMessage(ChatColor.GOLD + "Le lit de l'équipe " + team + " vient d'être détruit par " + e.getPlayer().getName() + " !");
+                        PlayerDataFile.setBeds(e.getPlayer(), PlayerDataFile.getBeds(e.getPlayer()) + 1);
+                        for (Player player : Bukkit.getOnlinePlayers())
+                            for (int i = 0; i < 8; i++)
+                                if (BedwarsPlugin.teams.get(i).equalsIgnoreCase(PlayerDataFile.getTeam(e.getPlayer()))) {
+                                    player.sendMessage(" ");
+                                    if (TeamDataFile.getPlayers(team).contains(player.getName()))
+                                        player.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "BED DESTRUCTION > " + ChatColor.GRAY + "Your bed was destroyed by " + BedwarsPlugin.chatcolors.get(i) + e.getPlayer().getName() + ChatColor.GRAY + "!");
+                                    else
+                                        for (int j = 0; j < 8; j++)
+                                            if (BedwarsPlugin.teams.get(j).equalsIgnoreCase(team))
+                                                player.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "BED DESTRUCTION > " + BedwarsPlugin.chatcolors.get(j) + team + " Bed" + ChatColor.GRAY + " was destroyed by " + BedwarsPlugin.chatcolors.get(i) + e.getPlayer().getName() + ChatColor.GRAY + "!");
+                                    player.sendMessage(" ");
+                                }
                     } else {
                         e.getPlayer().sendMessage(ChatColor.RED + "You can't break your own bed !");
+                        e.setCancelled(true);
                     }
                 }
     }
@@ -547,11 +641,13 @@ public class Events implements Listener {
                 if (event.getClick().isLeftClick()) {
                     String team = BedwarsPlugin.teams.get(event.getSlot());
                     TeamDataFile.setSpawnLocation(team, event.getWhoClicked().getLocation());
+                    TeamDataFile.setSpawn(team, true);
                     event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le spawn de cette équipe à été correctement placé !");
                 } else if (event.getClick().isRightClick()) {
                     Location spawnLocation = TeamDataFile.getSpawnLocation(BedwarsPlugin.teams.get(event.getSlot()));
                     if (spawnLocation.getX() + spawnLocation.getY() != 0) {
                         TeamDataFile.setSpawnLocation(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        TeamDataFile.setSpawn(BedwarsPlugin.teams.get(event.getSlot()), false);
                         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le spawn de cette équipe à été correctement retiré !");
                     }
                 }
@@ -563,11 +659,13 @@ public class Events implements Listener {
                 if (event.getClick().isLeftClick()) {
                     String team = BedwarsPlugin.teams.get(event.getSlot());
                     TeamDataFile.setGeneratorLocation(team, event.getWhoClicked().getLocation());
+                    TeamDataFile.setGenerator(team, true);
                     event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le générateur de cette équipe à été correctement placé !");
                 } else if (event.getClick().isRightClick()) {
                     Location generatorLocation = TeamDataFile.getGeneratorLocation(BedwarsPlugin.teams.get(event.getSlot()));
                     if (generatorLocation.getX() + generatorLocation.getY() != 0) {
                         TeamDataFile.setGeneratorLocation(BedwarsPlugin.teams.get(event.getSlot()), new Location(event.getWhoClicked().getWorld(), 0, 0, 0));
+                        TeamDataFile.setGenerator(BedwarsPlugin.teams.get(event.getSlot()), false);
                         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Le générateur de cette équipe à été correctement retiré !");
                     }
                 }
