@@ -8,6 +8,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +39,32 @@ public class GuiScoreboard {
             interline.setScore(i);
         }
 
-        Score event = o.getScore(ChatColor.WHITE + "Diamond II in " + ChatColor.GREEN + "5:59");
+        String next_event;
+        int time_next;
+        if (time < 6 * 60) {
+            next_event = "Diamond II";
+            time_next = 6 * 60 - time;
+        } else if (time < 12 * 60) {
+            next_event = "Emerald II";
+            time_next = 12 * 60 - time;
+        } else if (time < 24 * 60) {
+            next_event = "Diamond III";
+            time_next = 24 * 60 - time;
+        } else if (time < 30 * 60) {
+            next_event = "Emerald III";
+            time_next = 30 * 60 - time;
+        } else if (time < 36 * 60) {
+            next_event = "Bed Destruction";
+            time_next = 36 * 60 - time;
+        } else if (time < 42 * 60) {
+            next_event = "Sudden Death";
+            time_next = 42 * 60 - time;
+        } else {
+            next_event = "Game Over";
+            time_next = 52 * 60 - time;
+        }
+
+        Score event = o.getScore(ChatColor.WHITE + next_event + " in " + ChatColor.GREEN + LocalTime.MIN.plus(Duration.ofSeconds(time_next)).toString().substring(3));
         event.setScore(j + 2);
 
         Score kills = o.getScore(ChatColor.WHITE + "Kills: " + ChatColor.GREEN + PlayerDataFile.getKills(player));
