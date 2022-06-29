@@ -268,25 +268,35 @@ public class Events implements Listener {
             if (TeamDataFile.getPlayers(team).contains(e.getPlayer().getName())) {
                 if (TeamDataFile.hasBed(team)) {
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "5" + ChatColor.YELLOW + " seconds!");
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                    e.getPlayer().sendTitle(ChatColor.RED + "YOU DEAD!", ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "5" + ChatColor.YELLOW + " seconds!", 0, 30, 0);
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, () -> {
                         e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "4" + ChatColor.YELLOW + " seconds!");
-                    }, 0L, 20);
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendTitle(ChatColor.RED + "YOU DEAD!", ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "4" + ChatColor.YELLOW + " seconds!", 0, 30, 0);
+                    }, 20);
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, () -> {
                         e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "3" + ChatColor.YELLOW + " seconds!");
-                    }, 0L, 2 * 20);
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendTitle(ChatColor.RED + "YOU DEAD!", ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "3" + ChatColor.YELLOW + " seconds!", 0, 30, 0);
+                    }, 20 * 2);
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, () -> {
                         e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "2" + ChatColor.YELLOW + " seconds!");
-                    }, 0L, 3 * 20);
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+                        e.getPlayer().sendTitle(ChatColor.RED + "YOU DEAD!", ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "2" + ChatColor.YELLOW + " seconds!", 0, 30, 0);
+                    }, 20 * 3);
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, () -> {
                         e.getPlayer().sendMessage(ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "1" + ChatColor.YELLOW + " seconds!");
-                    }, 0L, 4 * 20);
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
-                        e.getPlayer().setGameMode(GameMode.SURVIVAL);
-                        TeamDataFile.addLivePlayer(team, e.getPlayer());
-                        e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
-                        setupInventory(e.getPlayer());
-                        e.getPlayer().sendMessage(ChatColor.YELLOW + "You have respawned!");
-                    }, 0L, 5 * 20);
+                        e.getPlayer().sendTitle(ChatColor.RED + "YOU DEAD!", ChatColor.YELLOW + "You will respawn in " + ChatColor.RED + "1" + ChatColor.YELLOW + " seconds!", 0, 30, 0);
+                    }, 20 * 4);
+                    BukkitRunnable task = new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            e.getPlayer().setGameMode(GameMode.SURVIVAL);
+                            TeamDataFile.addLivePlayer(team, e.getPlayer());
+                            e.getPlayer().teleport(TeamDataFile.getSpawnLocation(team));
+                            setupInventory(e.getPlayer());
+                            e.getPlayer().sendMessage(ChatColor.YELLOW + "You have respawned!");
+                            e.getPlayer().sendTitle(ChatColor.GREEN + "RESPAWNED!", "", 0, 20, 10);
+                        }
+                    };
+                    task.runTaskLater(instance, 20 * 5);
                 } else {
                     /*if (TeamDataFile.getLivePlayers(team).isEmpty()) {
                         Bukkit.broadcastMessage(" ");
